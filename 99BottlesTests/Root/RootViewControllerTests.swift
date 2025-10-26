@@ -1,0 +1,45 @@
+@testable import Bottles
+import Testing
+import UIKit
+
+struct RootViewControllerTests {
+    let subject = RootViewController()
+
+    @Test("imageView is correctly constructed")
+    func imageView() {
+        let imageView = subject.imageView
+        #expect(imageView.translatesAutoresizingMaskIntoConstraints == false)
+        #expect(imageView.image == UIImage(named: "marbleTrimmed.jpg")!)
+        #expect(imageView.contentMode == .scaleToFill)
+    }
+
+    @Test("wallView is correctly constructed")
+    func wallView() {
+        let wallView = subject.wallView
+        #expect(wallView.translatesAutoresizingMaskIntoConstraints == false)
+    }
+
+    @Test("numberDisplay is correctly constructed")
+    func numberDisplay() {
+        let numberDisplay = subject.numberDisplay
+        #expect(numberDisplay.translatesAutoresizingMaskIntoConstraints == false)
+        #expect(numberDisplay.text == "99")
+        #expect(numberDisplay.font == UIFont(name: "Helvetica", size: 144)!)
+        #expect(numberDisplay.textColor == UIColor(red: 0.757, green: 0.396, blue: 0.673, alpha: 1))
+        #expect(numberDisplay.shadowOffset == CGSize(width: 5, height: 4))
+        #expect(numberDisplay.shadowColor == UIColor(red: 0.434, green: 0.335, blue: 0.330, alpha: 0.41))
+    }
+
+    @Test("viewDidLoad: lays out subviews correctly")
+    func viewDidLoad() {
+        makeWindow(viewController: subject)
+        subject.loadViewIfNeeded()
+        subject.view.layoutIfNeeded()
+        #expect(subject.imageView.superview === subject.view)
+        #expect(subject.imageView.frame == subject.view.bounds)
+        #expect(subject.wallView.superview === subject.view)
+        #expect(subject.wallView.frame == subject.view.bounds.inset(by: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)))
+        #expect(subject.numberDisplay.superview === subject.wallView)
+        #expect(subject.numberDisplay.center == CGPoint(x: subject.wallView.bounds.midX + 0.25, y: subject.wallView.bounds.midY))
+    }
+}

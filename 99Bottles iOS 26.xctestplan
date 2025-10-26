@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "0AE90079-3105-41E0-B4F5-85FF9D450AA8",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:99Bottles iOS 26.xcodeproj",
+      "identifier" : "3F5457862EAE547E008C7A12",
+      "name" : "99Bottles iOS 26"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:99Bottles iOS 26.xcodeproj",
+        "identifier" : "3F5458C22EAE6A40008C7A12",
+        "name" : "99BottlesTests"
+      }
+    }
+  ],
+  "version" : 1
+}
