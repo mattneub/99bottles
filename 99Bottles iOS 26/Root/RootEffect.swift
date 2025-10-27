@@ -1,1 +1,3 @@
-enum RootEffect {}
+enum RootEffect: Equatable {
+    case startOver
+}

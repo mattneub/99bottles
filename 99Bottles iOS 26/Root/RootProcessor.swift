@@ -7,5 +7,10 @@ final class RootProcessor: Processor {
 
     var state = RootState()
 
-    func receive(_ action: RootAction) async {}
+    func receive(_ action: RootAction) async {
+        switch action {
+        case .initialLayout:
+            await presenter?.receive(.startOver)
+        }
+    }
 }

@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3FF29DEF2EAFB64A00522B23 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 3FF29DEE2EAFB64A00522B23 /* SnapshotTesting */; };
+		3FF29F0D2EAFC5D800522B23 /* WaitWhile in Frameworks */ = {isa = PBXBuildFile; productRef = 3FF29F0C2EAFC5D800522B23 /* WaitWhile */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		3F5458C72EAE6A40008C7A12 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -20,7 +25,7 @@
 		3F44377C2EAEA8DD00B51810 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = Sounds;
+			dstPath = Bottles;
 			dstSubfolderSpec = 7;
 			files = (
 			);
@@ -29,7 +34,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3F44388A2EAEAC1F00B51810 /* 99Bottles iOS 26.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = file; path = "99Bottles iOS 26.xctestplan"; sourceTree = "<group>"; };
+		3F44388A2EAEAC1F00B51810 /* 99Bottles iOS 26.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "99Bottles iOS 26.xctestplan"; sourceTree = "<group>"; };
 		3F5457872EAE547E008C7A12 /* 99Bottles iOS 26.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "99Bottles iOS 26.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F5458C32EAE6A40008C7A12 /* 99BottlesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = 99BottlesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -39,16 +44,36 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Resources/Bottles/bottle1.png,
+				Resources/Bottles/bottle2.png,
+				Resources/Bottles/bottle3.png,
+				Resources/Bottles/bottle4.png,
+				Resources/Bottles/bottle5.png,
 			);
 			target = 3F5457862EAE547E008C7A12 /* 99Bottles iOS 26 */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		3FF29DE72EAFA4ED00522B23 /* Exceptions for "99Bottles iOS 26" folder in "Copy Files" phase from "99Bottles iOS 26" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 3F44377C2EAEA8DD00B51810 /* CopyFiles */;
+			membershipExceptions = (
+				Resources/Bottles/bottle1.png,
+				Resources/Bottles/bottle2.png,
+				Resources/Bottles/bottle3.png,
+				Resources/Bottles/bottle4.png,
+				Resources/Bottles/bottle5.png,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3F5457892EAE547E008C7A12 /* 99Bottles iOS 26 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				3F5457992EAE547F008C7A12 /* Exceptions for "99Bottles iOS 26" folder in "99Bottles iOS 26" target */,
+				3FF29DE72EAFA4ED00522B23 /* Exceptions for "99Bottles iOS 26" folder in "Copy Files" phase from "99Bottles iOS 26" target */,
 			);
 			path = "99Bottles iOS 26";
 			sourceTree = "<group>";
@@ -72,6 +97,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FF29DEF2EAFB64A00522B23 /* SnapshotTesting in Frameworks */,
+				3FF29F0D2EAFC5D800522B23 /* WaitWhile in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,6 +168,8 @@
 			);
 			name = 99BottlesTests;
 			packageProductDependencies = (
+				3FF29DEE2EAFB64A00522B23 /* SnapshotTesting */,
+				3FF29F0C2EAFC5D800522B23 /* WaitWhile */,
 			);
 			productName = 99BottlesTests;
 			productReference = 3F5458C32EAE6A40008C7A12 /* 99BottlesTests.xctest */;
@@ -175,6 +204,10 @@
 			);
 			mainGroup = 3F54577E2EAE547D008C7A12;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3FF29DED2EAFB64A00522B23 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+				3FF29F0B2EAFC5D800522B23 /* XCRemoteSwiftPackageReference "WaitWhile" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3F5457882EAE547E008C7A12 /* Products */;
 			projectDirPath = "";
@@ -496,6 +529,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3FF29DED2EAFB64A00522B23 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.18.7;
+			};
+		};
+		3FF29F0B2EAFC5D800522B23 /* XCRemoteSwiftPackageReference "WaitWhile" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mattneub/WaitWhile";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3FF29DEE2EAFB64A00522B23 /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3FF29DED2EAFB64A00522B23 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+		3FF29F0C2EAFC5D800522B23 /* WaitWhile */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3FF29F0B2EAFC5D800522B23 /* XCRemoteSwiftPackageReference "WaitWhile" */;
+			productName = WaitWhile;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3F54577F2EAE547D008C7A12 /* Project object */;
 }

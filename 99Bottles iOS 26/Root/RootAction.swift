@@ -1,1 +1,3 @@
-enum RootAction {}
+enum RootAction: Equatable {
+    case initialLayout
+}

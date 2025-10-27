@@ -48,7 +48,55 @@ final class RootViewController: UIViewController, ReceiverPresenter {
         ])
     }
 
+    private var didInitialSetup = false
+    override func viewDidLayoutSubviews() {
+        if !self.didInitialSetup {
+            self.didInitialSetup = true
+            Task {
+                await processor?.receive(.initialLayout)
+            }
+        }
+    }
+
     func present(_ state: RootState) async {}
 
-    func receive(_ effect: RootEffect) async {}
+    func receive(_ effect: RootEffect) async {
+        switch effect {
+        case .startOver:
+            startOver()
+        }
+    }
+
+    func startOver() {
+        let scale: CGFloat = view.window?.windowScene?.screen.scale ?? 2
+        numberDisplay.text = String(99) // TODO: needs to come from current layout
+        // clear existing bottles but leave the label
+        wallView.layer.sublayers = [self.numberDisplay.layer]
+        // make new bottles
+        let frameRect = wallView.bounds
+        let bottleLayout = BottleLayout.layouts[0] // TODO: Needs to come from current layout
+        let (rows, cols) = (bottleLayout.rows, bottleLayout.cols)
+        let frows = CGFloat(rows), fcols = CGFloat(cols)
+        let separator: CGFloat = 2.0
+        let size = CGSize(
+            width: (frameRect.size.width - (separator * (fcols + 1))) / fcols,
+            height: (frameRect.size.height - (separator * (frows + 1))) / frows
+        )
+        let intercellSpacing = CGSize(width: separator, height: separator)
+        for row in 0..<rows {
+            for col in 0..<cols {
+                let cellframe = CGRect(
+                    x: intercellSpacing.width + (size.width + intercellSpacing.width) * CGFloat(col),
+                    y: intercellSpacing.height + (size.height + intercellSpacing.height) * CGFloat(row),
+                    width: size.width,
+                    height: size.height
+                )
+                let layer = BottleLayer(bottleNumber: Int.random(in: 1...5), scale: scale)
+                layer.frame = cellframe
+                wallView.layer.addSublayer(layer)
+                layer.setNeedsDisplay()
+                layer.displayIfNeeded()
+            }
+        }
+    }
 }
