@@ -66,4 +66,18 @@ struct RootCoordinatorTests {
         #expect(myAction.userInfo as? [String: Int] == ["ha": 2])
         #expect(subject.actionSheetContinuation == nil)
     }
+
+    @Test("dismiss: dismisses presented view controller")
+    func dismiss() async {
+        let viewController = UIViewController()
+        makeWindow(viewController: viewController)
+        subject.rootViewController = viewController
+        let viewController2 = UIViewController()
+        viewController.present(viewController2, animated: false)
+        await #while(viewController.presentedViewController == nil)
+        // that was prep, this is the test
+        await subject.dismiss()
+        await #while(viewController.presentedViewController != nil)
+        #expect(viewController.presentedViewController == nil)
+    }
 }

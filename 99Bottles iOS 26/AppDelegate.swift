@@ -1,5 +1,8 @@
 import UIKit
 
+@MainActor
+var services = Services()
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(

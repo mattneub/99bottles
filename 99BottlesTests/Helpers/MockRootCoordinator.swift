@@ -32,5 +32,8 @@ final class MockRootCoordinator: RootCoordinatorType {
         return actionToReturn
     }
 
+    func dismiss() async {
+        methodsCalled.append(#function)
+    }
 }
 

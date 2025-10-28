@@ -13,9 +13,15 @@ final class PreferencesViewController: UIViewController, ReceiverPresenter {
         navigationItem.rightBarButtonItem = done
         let cancel = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
         navigationItem.leftBarButtonItem = cancel
+        Task {
+            await processor?.receive(.initialData)
+        }
     }
 
-    func present(_ state: PreferencesState) async {}
+    func present(_ state: PreferencesState) async {
+        pickerView.selectRow(state.layoutNumber, inComponent: 0, animated: false)
+        autoplaySwitch.isOn = state.autoplay
+    }
 
     @objc func done() {
         let layout = pickerView.selectedRow(inComponent: 0)

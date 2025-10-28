@@ -11,8 +11,8 @@ struct PreferencesViewControllerTests {
         subject.processor = processor
     }
 
-    @Test("viewDidLoad: configures navigation item")
-    func viewDidLoad() throws {
+    @Test("viewDidLoad: configures navigation item, sends initialData")
+    func viewDidLoad() async throws {
         subject.loadViewIfNeeded()
         #expect(subject.navigationItem.title == "Preferences")
         let done = try #require(subject.navigationItem.rightBarButtonItem)
@@ -21,6 +21,19 @@ struct PreferencesViewControllerTests {
         let cancel = try #require(subject.navigationItem.leftBarButtonItem)
         #expect(cancel.target === subject)
         #expect(cancel.action == #selector(subject.cancel))
+        await #while(processor.thingsReceived.isEmpty)
+        #expect(processor.thingsReceived == [.initialData])
+    }
+
+    @Test("present: sets up picker view and switch")
+    func present() async {
+        subject.loadViewIfNeeded()
+        await subject.present(.init(autoplay: true, layoutNumber: 21))
+        #expect(subject.autoplaySwitch.isOn)
+        #expect(subject.pickerView.selectedRow(inComponent: 0) == 21)
+        await subject.present(.init(autoplay: false, layoutNumber: 20))
+        #expect(!subject.autoplaySwitch.isOn)
+        #expect(subject.pickerView.selectedRow(inComponent: 0) == 20)
     }
 
     @Test("done: sends done, reporting state of interface")
@@ -29,8 +42,8 @@ struct PreferencesViewControllerTests {
         subject.pickerView.selectRow(10, inComponent: 0, animated: false)
         subject.autoplaySwitch.isOn = false
         subject.done()
-        await #while(processor.thingsReceived.isEmpty)
-        #expect(processor.thingsReceived == [.done(10, false)])
+        await #while(processor.thingsReceived.count < 2)
+        #expect(processor.thingsReceived.last == .done(10, false))
     }
 
     @Test("cancel: sends cancel")

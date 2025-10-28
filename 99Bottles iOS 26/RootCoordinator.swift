@@ -4,6 +4,7 @@ protocol RootCoordinatorType: AnyObject {
     func createInterface(window: UIWindow)
     func showPreferences()
     func showActionSheet(title: String?, titles: [String], userInfos: [[String: Any]]) async -> UIAlertAction?
+    func dismiss() async
 }
 
 final class RootCoordinator: RootCoordinatorType {
@@ -57,5 +58,15 @@ final class RootCoordinator: RootCoordinatorType {
         }
     }
 
+    func dismiss() async {
+        guard rootViewController?.presentedViewController != nil else {
+            return
+        }
+        await withCheckedContinuation { continuation in
+            rootViewController?.dismiss(animated: unlessTesting(true)) {
+                continuation.resume(returning: ())
+            }
+        }
+    }
 
 }
