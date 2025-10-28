@@ -46,6 +46,9 @@ final class RootViewController: UIViewController, ReceiverPresenter {
             numberDisplay.centerXAnchor.constraint(equalTo: wallView.centerXAnchor),
             numberDisplay.centerYAnchor.constraint(equalTo: wallView.centerYAnchor),
         ])
+
+        let tapper = MyTapGestureRecognizer(target: self, action: #selector(tapped))
+        view.addGestureRecognizer(tapper)
     }
 
     private var didInitialSetup = false
@@ -97,6 +100,12 @@ final class RootViewController: UIViewController, ReceiverPresenter {
                 layer.setNeedsDisplay()
                 layer.displayIfNeeded()
             }
+        }
+    }
+
+    @objc func tapped() {
+        Task {
+            await processor?.receive(.tapped)
         }
     }
 }

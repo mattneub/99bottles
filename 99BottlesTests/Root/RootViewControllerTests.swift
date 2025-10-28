@@ -36,8 +36,8 @@ struct RootViewControllerTests {
         #expect(numberDisplay.shadowColor == UIColor(red: 0.434, green: 0.335, blue: 0.330, alpha: 0.41))
     }
 
-    @Test("viewDidLoad: lays out subviews correctly")
-    func viewDidLoad() {
+    @Test("viewDidLoad: lays out subviews correctly, adds tap gesture recognizer")
+    func viewDidLoad() throws {
         makeWindow(viewController: subject)
         subject.loadViewIfNeeded()
         subject.view.layoutIfNeeded()
@@ -47,6 +47,9 @@ struct RootViewControllerTests {
         #expect(subject.wallView.frame == subject.view.bounds.inset(by: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)))
         #expect(subject.numberDisplay.superview === subject.wallView)
         #expect(subject.numberDisplay.center == CGPoint(x: subject.wallView.bounds.midX + 0.25, y: subject.wallView.bounds.midY))
+        let tapper = try #require(subject.view.gestureRecognizers?.first as? MyTapGestureRecognizer)
+        #expect(tapper.target === subject)
+        #expect(tapper.action == #selector(subject.tapped))
     }
 
     @Test("viewDidLayoutSubviews: sends initialLayout, first time only")
@@ -71,5 +74,12 @@ struct RootViewControllerTests {
         #expect(bottles.count == 99)
         #expect(bottles[0].frame.origin == CGPoint(x: 2, y: 2))
         #expect(bottles[0].frame.integral.size == CGSize(width: 40, height: 57)) // close enough
+    }
+
+    @Test("tapped: sends tapped")
+    func tapped() async {
+        subject.tapped()
+        await #while(processor.thingsReceived.isEmpty)
+        #expect(processor.thingsReceived == [.tapped])
     }
 }

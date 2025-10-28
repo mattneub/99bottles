@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24128" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PreferencesViewController" customModule="Bottles" customModuleProvider="target">
+            <connections>
+                <outlet property="autoplaySwitch" destination="Eqr-SD-eVN" id="p5t-lP-icr"/>
+                <outlet property="pickerView" destination="Ci0-jd-WkE" id="BfO-Py-8TA"/>
+                <outlet property="view" destination="UtR-XP-D6h" id="nJW-lp-7Wb"/>
+            </connections>
+        </placeholder>
+        <view contentMode="scaleToFill" id="UtR-XP-D6h">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ci0-jd-WkE">
+                    <rect key="frame" x="0.0" y="118" width="393" height="216"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="dq4-wE-Hz3"/>
+                        <outlet property="delegate" destination="-1" id="WJq-Ld-mzH"/>
+                    </connections>
+                </pickerView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Autoplay mode" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GOY-vR-VGZ">
+                    <rect key="frame" x="26" y="377" width="115" height="21"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Eqr-SD-eVN">
+                    <rect key="frame" x="189" y="373.66666666666669" width="63" height="28"/>
+                </switch>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="lEz-sn-Gj2"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="Ci0-jd-WkE" firstAttribute="leading" secondItem="lEz-sn-Gj2" secondAttribute="leading" id="FTq-ou-qnk"/>
+                <constraint firstItem="GOY-vR-VGZ" firstAttribute="leading" secondItem="lEz-sn-Gj2" secondAttribute="leading" constant="26" id="GHa-cq-foK"/>
+                <constraint firstItem="lEz-sn-Gj2" firstAttribute="trailing" secondItem="Ci0-jd-WkE" secondAttribute="trailing" id="KwX-Xn-s2H"/>
+                <constraint firstItem="Eqr-SD-eVN" firstAttribute="leading" secondItem="GOY-vR-VGZ" secondAttribute="trailing" constant="48" id="VKa-en-bzS"/>
+                <constraint firstItem="Ci0-jd-WkE" firstAttribute="top" secondItem="lEz-sn-Gj2" secondAttribute="top" id="VY1-ZY-CSJ"/>
+                <constraint firstItem="GOY-vR-VGZ" firstAttribute="top" secondItem="Ci0-jd-WkE" secondAttribute="bottom" constant="43" id="heB-Is-ple"/>
+                <constraint firstItem="Eqr-SD-eVN" firstAttribute="centerY" secondItem="GOY-vR-VGZ" secondAttribute="centerY" id="ntm-YX-Kni"/>
+            </constraints>
+            <point key="canvasLocation" x="-1292" y="-44"/>
+        </view>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
