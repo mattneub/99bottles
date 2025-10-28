@@ -1,3 +1,3 @@
 enum RootEffect: Equatable {
-    case startOver
+    case startOver(BottleLayout)
 }

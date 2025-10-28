@@ -9,6 +9,8 @@ struct RootViewControllerTests {
 
     init() {
         subject.processor = processor
+        services.view = MockUIView.self
+        MockUIView.reset()
     }
 
     @Test("imageView is correctly constructed")
@@ -62,18 +64,22 @@ struct RootViewControllerTests {
         #expect(processor.thingsReceived == [.initialLayout])
     }
 
-    @Test("receive startOver: removes all bottle layers, creates new bottle layout")
+    @Test("receive startOver: removes all bottle layers, creates new bottle layout as specified")
     func startOver() async throws {
         makeWindow(viewController: subject)
         subject.loadViewIfNeeded()
         subject.view.layoutIfNeeded()
         subject.wallView.layer.addSublayer(BottleLayer(bottleNumber: 1, scale: 2))
         subject.wallView.layer.addSublayer(BottleLayer(bottleNumber: 1, scale: 2))
-        await subject.receive(.startOver)
+        await subject.receive(.startOver(BottleLayout.layouts[4]))
         let bottles = try #require(subject.wallView.layer.sublayers?.compactMap { $0 as? BottleLayer })
-        #expect(bottles.count == 99)
+        #expect(bottles.count == BottleLayout.layouts[4].count)
         #expect(bottles[0].frame.origin == CGPoint(x: 2, y: 2))
-        #expect(bottles[0].frame.integral.size == CGSize(width: 40, height: 57)) // close enough
+        #expect(bottles[0].frame.integral.size == CGSize(width: 45, height: 63)) // close enough
+        #expect(subject.numberDisplay.text == String(bottles.count))
+        // I can prove there was an animation, but I can't prove what it was
+        #expect(MockUIView.methodsCalled.first == "animateAsync(withDuration:delay:options:animations:)")
+        #expect(MockUIView.duration == 0.25)
     }
 
     @Test("tapped: sends tapped")

@@ -10,7 +10,9 @@ final class RootProcessor: Processor {
     func receive(_ action: RootAction) async {
         switch action {
         case .initialLayout:
-            await presenter?.receive(.startOver)
+            let layoutIndex = services.persistence.layoutNumber()
+            let layout = BottleLayout.layouts[layoutIndex]
+            await presenter?.receive(.startOver(layout))
         case .tapped:
             await tapped()
         }
@@ -46,4 +48,14 @@ final class RootProcessor: Processor {
         case preferences
     }
 
+}
+
+extension RootProcessor: PreferencesDelegate {
+    func cancel() async {}
+
+    func done() async {
+        let layoutIndex = services.persistence.layoutNumber()
+        let layout = BottleLayout.layouts[layoutIndex]
+        await presenter?.receive(.startOver(layout))
+    }
 }

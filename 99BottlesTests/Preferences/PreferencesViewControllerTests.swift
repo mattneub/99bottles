@@ -81,4 +81,12 @@ struct PreferencesViewControllerTests {
         }
     }
 
+    @Test("didDismiss: sends cancel")
+    func didDismiss() async {
+        subject.presentationControllerDidDismiss(
+            UIPresentationController(presentedViewController: UIViewController(), presenting: nil)
+        )
+        await #while(processor.thingsReceived.isEmpty)
+        #expect(processor.thingsReceived == [.cancel])
+    }
 }

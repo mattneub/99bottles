@@ -14,7 +14,7 @@ struct BottleLayout: Equatable, Codable {
     /// omissions. The rule is pretty clear: `rows * cols` must give an integer, `rows` must be
     /// greater than or equal to `cols`, and the difference between `rows` and `cols` must not
     /// exceed 3.
-    static var layouts: [BottleLayout] {
+    static var layouts: [BottleLayout] = {
         var dictionary = [Int: (rows: Int, cols: Int)]()
         func factorize(_ product: Int) {
             let limit = Int(Double(product).squareRoot()) // maximum possible factor value
@@ -47,5 +47,5 @@ struct BottleLayout: Equatable, Codable {
                 BottleLayout(count: $0.key, rows: $0.value.rows, cols: $0.value.cols)
             }
         return result
-    }
+    }()
 }

@@ -65,19 +65,33 @@ final class RootViewController: UIViewController, ReceiverPresenter {
 
     func receive(_ effect: RootEffect) async {
         switch effect {
-        case .startOver:
-            startOver()
+        case .startOver(let layout):
+            var snapshotView: UIView? // wrap bottle creation in snapshot so it seems to fade in
+            if view.window != nil {
+                if let snapshot = view.snapshotView(afterScreenUpdates: true) {
+                    snapshotView = snapshot
+                    snapshot.frame = self.view.bounds
+                    snapshot.layer.zPosition = 1000
+                    self.view.addSubview(snapshot)
+                }
+            }
+            await startOver(layout)
+            if let snapshotView {
+                await services.view.animateAsync(withDuration: 0.25, delay: 0, options: []) {
+                    snapshotView.alpha = 0
+                }
+                snapshotView.removeFromSuperview()
+            }
         }
     }
 
-    func startOver() {
+    func startOver(_ bottleLayout: BottleLayout) async {
         let scale: CGFloat = view.window?.windowScene?.screen.scale ?? 2
-        numberDisplay.text = String(99) // TODO: needs to come from current layout
+        numberDisplay.text = String(bottleLayout.count)
         // clear existing bottles but leave the label
         wallView.layer.sublayers = [self.numberDisplay.layer]
         // make new bottles
         let frameRect = wallView.bounds
-        let bottleLayout = BottleLayout.layouts[0] // TODO: Needs to come from current layout
         let (rows, cols) = (bottleLayout.rows, bottleLayout.cols)
         let frows = CGFloat(rows), fcols = CGFloat(cols)
         let separator: CGFloat = 2.0

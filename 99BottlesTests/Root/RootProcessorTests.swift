@@ -6,16 +6,20 @@ struct RootProcessorTests {
     let subject = RootProcessor()
     let presenter = MockReceiverPresenter<RootEffect, RootState>()
     let coordinator = MockRootCoordinator()
+    let persistence = MockPersistence()
 
     init() {
         subject.presenter = presenter
         subject.coordinator = coordinator
+        services.persistence = persistence
     }
 
-    @Test("initialLayout: sends startOver")
+    @Test("initialLayout: get layout number from persistence, sends startOver")
     func initialLayout() async {
+        persistence.layoutToReturn = 4
         await subject.receive(.initialLayout)
-        #expect(presenter.thingsReceived == [.startOver])
+        #expect(persistence.methodsCalled == ["layoutNumber()"])
+        #expect(presenter.thingsReceived == [.startOver(BottleLayout.layouts[4])])
     }
 
     @Test("tapped: constructs and sends coordinator showActionSheet")
@@ -43,5 +47,13 @@ struct RootProcessorTests {
         }
         await subject.receive(.tapped)
         #expect(coordinator.methodsCalled == ["showActionSheet(title:titles:userInfos:)", "showPreferences()"])
+    }
+
+    @Test("done: get layout number from persistence, sends startOver")
+    func done() async {
+        persistence.layoutToReturn = 4
+        await subject.done()
+        #expect(persistence.methodsCalled == ["layoutNumber()"])
+        #expect(presenter.thingsReceived == [.startOver(BottleLayout.layouts[4])])
     }
 }

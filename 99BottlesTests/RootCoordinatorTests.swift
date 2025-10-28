@@ -24,6 +24,7 @@ struct RootCoordinatorTests {
         let rootViewController = UIViewController()
         makeWindow(viewController: rootViewController)
         subject.rootViewController = rootViewController
+        subject.rootProcessor = MockPreferencesDelegate()
         subject.showPreferences()
         let processor = try #require(subject.preferencesProcessor as? PreferencesProcessor)
         #expect(processor.coordinator === subject)
@@ -32,6 +33,8 @@ struct RootCoordinatorTests {
         await #while(rootViewController.presentedViewController == nil)
         let navigationController = try #require(rootViewController.presentedViewController as? UINavigationController)
         #expect(navigationController.viewControllers.first === viewController)
+        #expect(navigationController.presentationController?.delegate === viewController)
+        #expect(processor.delegate === subject.rootProcessor)
     }
 
     @Test("showActionSheet: presents action sheet")

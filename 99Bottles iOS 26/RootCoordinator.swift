@@ -33,7 +33,9 @@ final class RootCoordinator: RootCoordinatorType {
         processor.coordinator = self
         viewController.processor = processor
         let navigationController = UINavigationController(rootViewController: viewController)
+        navigationController.presentationController?.delegate = viewController
         rootViewController?.present(navigationController, animated: unlessTesting(true))
+        processor.delegate = rootProcessor as? PreferencesDelegate
     }
 
     var actionSheetContinuation: CheckedContinuation<UIAlertAction?, Never>?

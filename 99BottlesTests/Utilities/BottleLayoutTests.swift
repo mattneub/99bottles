@@ -170,5 +170,18 @@ struct BottleLayoutTests {
         ]
         #expect(result == expected)
     }
+
+    @Test("Bottle layouts are generated just once in the lifetime of the app")
+    func justOnce() {
+        var ptr1: String?
+        var ptr2: String?
+        withUnsafePointer(to: &BottleLayout.layouts[0]) {
+            ptr1 = String(format: "%p", $0)
+        }
+        withUnsafePointer(to: &BottleLayout.layouts[0]) {
+            ptr2 = String(format: "%p", $0)
+        }
+        #expect(ptr1 == ptr2) // I _think_ this proves it
+    }
 }
 

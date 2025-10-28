@@ -52,3 +52,11 @@ extension PreferencesViewController: UIPickerViewDataSource, UIPickerViewDelegat
         return String(count) + " Bottle" + (count > 1 ? "s" : "")
     }
 }
+
+extension PreferencesViewController: UIAdaptivePresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        Task {
+            await processor?.receive(.cancel)
+        }
+    }
+}
