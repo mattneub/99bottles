@@ -4,8 +4,8 @@ import UIKit
 nonisolated
 class BottleLayer: CALayer, CAAnimationDelegate {
     /// Number of the bottle to draw.
-    var bottleNumber: Int
-    
+    let bottleNumber: Int
+
     /// Initialize the layer.
     /// - Parameters:
     ///   - bottleNumber: The number of the bottle image to use, in the range `1...5`.
@@ -14,6 +14,15 @@ class BottleLayer: CALayer, CAAnimationDelegate {
         self.bottleNumber = bottleNumber
         super.init()
         self.contentsScale = scale
+    }
+
+    override init(layer other: Any) {
+        guard let other = other as? BottleLayer else {
+            fatalError("Tried to init(layer:) with wrong kind of layer")
+        }
+        self.bottleNumber = other.bottleNumber
+        super.init()
+        self.contentsScale = other.contentsScale
     }
 
     required init(coder: NSCoder) {
@@ -28,4 +37,8 @@ class BottleLayer: CALayer, CAAnimationDelegate {
             UIGraphicsPopContext()
         }
     }
+
+    func jiggle() {}
+
+    func flyAway() {}
 }

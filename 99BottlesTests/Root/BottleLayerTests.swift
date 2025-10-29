@@ -83,4 +83,12 @@ struct BottleLayerTests {
         layer.displayIfNeeded()
         assertSnapshot(of: view, as: .image)
     }
+
+    @Test("init(layer:) makes a correct copy")
+    func initLayer() {
+        let layer = BottleLayer(bottleNumber: 5, scale: 2)
+        let layer2 = BottleLayer(layer: layer)
+        #expect(layer2.bottleNumber == 5)
+        #expect(layer2.contentsScale == 2)
+    }
 }
