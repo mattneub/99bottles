@@ -3,6 +3,15 @@ import Testing
 import Foundation
 
 struct PreparerTests {
+    @Test("nextStage gives Singer with same specifications")
+    func nextStage() throws {
+        let subject = Preparer(bottleNumber: 99, interactive: false)
+        let nextState = try #require(subject.nextState() as? Singer)
+        #expect(nextState.bottleNumber == 99)
+        #expect(nextState.interactive == false)
+        #expect(nextState.verse == subject.verse)
+    }
+
     @Test("99 gives correct verse")
     func verse99() {
         let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2)
@@ -170,7 +179,6 @@ struct PreparerTests {
 
     @Test("1 gives correct verse interactive")
     func verse1interactive() {
-        let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2)
         let subject = Preparer(bottleNumber: 1, interactive: true)
         let verse = subject.verse
         #expect(verse.count == 3)

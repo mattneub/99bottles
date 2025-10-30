@@ -77,7 +77,7 @@ final class RootViewController: UIViewController, ReceiverPresenter {
             }
             await startOver(layout)
             if let snapshotView {
-                await services.view.animateAsync(withDuration: 0.25, delay: 0, options: []) {
+                await services.viewType.animateAsync(withDuration: 0.25, delay: 0, options: []) {
                     snapshotView.alpha = 0
                 }
                 snapshotView.removeFromSuperview()

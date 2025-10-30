@@ -2,10 +2,12 @@
 /// for singing and dancing about that number into a verse.
 final class Preparer: StateType {
     let bottleNumber: Int
+    let interactive: Bool
     var verse = [Phrase]()
 
     init(bottleNumber: Int, interactive: Bool = false) {
         self.bottleNumber = bottleNumber
+        self.interactive = interactive
         buildVerse(interactive: interactive)
     }
 
@@ -45,7 +47,7 @@ final class Preparer: StateType {
         }
     }
 
-    func nextState() -> any StateType {
-        return Preparer(bottleNumber: bottleNumber) // TODO: not really
+    func nextState() -> (any StateType)? {
+        return Singer(bottleNumber: bottleNumber, interactive: interactive, verse: verse)
     }
 }

@@ -9,7 +9,7 @@ struct RootViewControllerTests {
 
     init() {
         subject.processor = processor
-        services.view = MockUIView.self
+        services.viewType = MockUIView.self
         MockUIView.reset()
     }
 

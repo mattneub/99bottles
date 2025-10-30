@@ -1,7 +1,11 @@
 import UIKit
+import AVFoundation
 
 final class Services {
+    var audioPlayerType: AudioPlayerType.Type = AVAudioPlayer.self
+    var bundle: BundleType = Bundle.main
     var persistence: PersistenceType = Persistence()
+    var playerType: PlayerType.Type = Player.self
     var userDefaults: UserDefaultsType = UserDefaults.standard
-    var view: UIView.Type = UIView.self
+    var viewType: UIView.Type = UIView.self
 }

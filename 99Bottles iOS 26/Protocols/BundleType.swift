@@ -1,7 +1,7 @@
 import Foundation
 
 protocol BundleType {
-    func path(forResource: String?, ofType: String?) -> String?
+    func url(forResource: String?, withExtension: String?, subdirectory: String?) -> URL?
 }
 
 extension Bundle: BundleType {}

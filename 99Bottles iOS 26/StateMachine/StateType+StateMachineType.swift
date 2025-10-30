@@ -1,7 +1,7 @@
 /// A state is merely a class that knows how to generate the next state.
 /// (This simplicity is possible because our states go in a fixed cycle.)
 protocol StateType: AnyObject {
-    func nextState() -> StateType
+    func nextState() -> (any StateType)?
 }
 
 /// A state machine is a class that has a state and can proceed to the next state by asking
@@ -13,8 +13,6 @@ protocol StateMachineType: AnyObject {
 
 extension StateMachineType {
     func proceedToNextState() {
-        if let nextState = currentState?.nextState() {
-            currentState = nextState
-        }
+        currentState = currentState?.nextState()
     }
 }
