@@ -1,5 +1,6 @@
 import UIKit
 
+/// Public face of the root coordinator, so we can mock it for testing.
 protocol RootCoordinatorType: AnyObject {
     func createInterface(window: UIWindow)
     func showPreferences()
@@ -7,6 +8,7 @@ protocol RootCoordinatorType: AnyObject {
     func dismiss() async
 }
 
+/// Object that constructs modules and manipulates view controllers.
 final class RootCoordinator: RootCoordinatorType {
     weak var rootViewController: UIViewController?
 

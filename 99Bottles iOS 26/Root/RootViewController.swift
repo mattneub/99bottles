@@ -1,25 +1,35 @@
 import UIKit
 
+/// View controller for the main screen.
 final class RootViewController: UIViewController, ReceiverPresenter {
+    /// Reference to the processor, set by coordinator at module creation time.
     weak var processor: (any Receiver<RootAction>)?
 
+    /// Background of the screen.
     lazy var imageView = UIImageView().applying {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.image = UIImage(named: "marbleTrimmed.jpg")
         $0.contentMode = .scaleToFill
     }
 
+    /// Area in which bottles can appear.
     lazy var wallView = UIView().applying {
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
 
+    /// Label that tells how many bottles there are currently.
     lazy var numberDisplay = UILabel().applying {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.text = "99"
+        $0.text = ""
         $0.font = UIFont(name: "Helvetica", size: 144) ?? UIFont.systemFont(ofSize: 144)
         $0.textColor = UIColor(red: 0.757, green: 0.396, blue: 0.673, alpha: 1)
         $0.shadowOffset = CGSize(width: 5, height: 4)
         $0.shadowColor = UIColor(red: 0.434, green: 0.335, blue: 0.330, alpha: 0.41)
+    }
+
+    /// Computed property supplying all currently existing layers.
+    var bottles: [BottleLayer] {
+        wallView.layer.sublayers?.compactMap { $0 as? BottleLayer } ?? []
     }
 
     override func viewDidLoad() {
@@ -65,8 +75,13 @@ final class RootViewController: UIViewController, ReceiverPresenter {
 
     func receive(_ effect: RootEffect) async {
         switch effect {
+        case .proposeBottle:
+            let bottles = self.bottles
+            let layerNumber = Int.random(in: 0..<bottles.count)
+            await processor?.receive(.proposeBottle(bottles[layerNumber], count: bottles.count))
         case .startOver(let layout):
-            var snapshotView: UIView? // wrap bottle creation in snapshot so it seems to fade in
+            // wrap bottle creation in snapshot so bottles fade in rather than appearing abruptly
+            var snapshotView: UIView?
             if view.window != nil {
                 if let snapshot = view.snapshotView(afterScreenUpdates: true) {
                     snapshotView = snapshot
@@ -82,11 +97,27 @@ final class RootViewController: UIViewController, ReceiverPresenter {
                 }
                 snapshotView.removeFromSuperview()
             }
+        case .updateLabel:
+            await services.viewType.transitionAsync(
+                with: numberDisplay,
+                duration: 0.4,
+                options: .transitionFlipFromTop,
+                animations: { [self] in
+                    numberDisplay.text = String(bottles.count)
+                }
+            )
         }
     }
 
+    /// Workhorse subroutine of receiving `.startOver`. Make bottles in the arrangement
+    /// described by the layout object.
     func startOver(_ bottleLayout: BottleLayout) async {
-        let scale: CGFloat = view.window?.windowScene?.screen.scale ?? 2
+        guard let scale: CGFloat = view.window?.windowScene?.screen.scale else {
+            return
+        }
+        guard let screenBounds: CGRect = view.window?.windowScene?.screen.bounds else {
+            return
+        }
         numberDisplay.text = String(bottleLayout.count)
         // clear existing bottles but leave the label
         wallView.layer.sublayers = [self.numberDisplay.layer]
@@ -108,7 +139,11 @@ final class RootViewController: UIViewController, ReceiverPresenter {
                     width: size.width,
                     height: size.height
                 )
-                let layer = BottleLayer(bottleNumber: Int.random(in: 1...5), scale: scale)
+                let layer = BottleLayer(
+                    bottleNumber: Int.random(in: 1...5),
+                    scale: scale,
+                    screenBounds: screenBounds
+                )
                 layer.frame = cellframe
                 wallView.layer.addSublayer(layer)
                 layer.setNeedsDisplay()
@@ -117,6 +152,7 @@ final class RootViewController: UIViewController, ReceiverPresenter {
         }
     }
 
+    /// The user has tapped the background.
     @objc func tapped() {
         Task {
             await processor?.receive(.tapped)

@@ -1,8 +1,19 @@
 import Foundation
 
+/// A Singer is a State plus a `sing` method.
+protocol SingerType: StateType {
+    func sing(bottleLayer: BottleLayer?) async throws
+}
+
+extension SingerType {
+    func sing() async throws {
+        try await sing(bottleLayer: nil)
+    }
+}
+
 /// Stage two! This is the object that knows how to sing one phrase —
 /// namely, the first phrase in its `verse`.
-final class Singer: StateType {
+final class Singer: SingerType {
     let bottleNumber: Int
     let interactive: Bool
     var verse: [Phrase]
@@ -14,7 +25,7 @@ final class Singer: StateType {
         self.verse = verse
     }
 
-    func sing() async throws {
+    func sing(bottleLayer: BottleLayer? = nil) async throws {
         guard verse.count > 0 else {
             return // shouldn't happen, but we would crash if it did
         }
@@ -27,6 +38,9 @@ final class Singer: StateType {
             return
         }
         self.player = try services.playerType.init(soundFile: url)
+        if let bottleLayer {
+            phrase.action?(bottleLayer)
+        }
         await player?.playAsync()
     }
 

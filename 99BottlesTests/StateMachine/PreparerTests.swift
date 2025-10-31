@@ -1,6 +1,7 @@
 @testable import Bottles
 import Testing
 import Foundation
+import CoreGraphics
 
 struct PreparerTests {
     @Test("nextStage gives Singer with same specifications")
@@ -14,7 +15,7 @@ struct PreparerTests {
 
     @Test("99 gives correct verse")
     func verse99() {
-        let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2)
+        let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2, screenBounds: .zero)
         let subject = Preparer(bottleNumber: 99, interactive: false)
         let verse = subject.verse
         #expect(verse.count == 10)
@@ -56,7 +57,7 @@ struct PreparerTests {
 
     @Test("99 gives correct verse if interactive")
     func verse99interactive() {
-        let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2)
+        let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2, screenBounds: .zero)
         let subject = Preparer(bottleNumber: 99, interactive: true) // *
         let verse = subject.verse
         #expect(verse.count == 10)
@@ -98,7 +99,7 @@ struct PreparerTests {
 
     @Test("2 gives correct verse")
     func verse2() {
-        let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2)
+        let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2, screenBounds: .zero)
         let subject = Preparer(bottleNumber: 2, interactive: false)
         let verse = subject.verse
         #expect(verse.count == 6)
@@ -128,7 +129,7 @@ struct PreparerTests {
 
     @Test("2 gives correct verse interactive")
     func verse2interactive() {
-        let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2)
+        let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2, screenBounds: .zero)
         let subject = Preparer(bottleNumber: 2, interactive: true)
         let verse = subject.verse
         #expect(verse.count == 6)
@@ -158,7 +159,7 @@ struct PreparerTests {
 
     @Test("1 gives correct verse")
     func verse1() {
-        let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2)
+        let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2, screenBounds: .zero)
         let subject = Preparer(bottleNumber: 1, interactive: false)
         let verse = subject.verse
         #expect(verse.count == 3)

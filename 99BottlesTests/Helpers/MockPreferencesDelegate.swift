@@ -2,7 +2,7 @@ import UIKit
 @testable import Bottles
 
 final class MockPreferencesDelegate: @MainActor Processor, PreferencesDelegate {
-    var presenter: (any Bottles.ReceiverPresenter<Bottles.RootEffect, Bottles.RootState>)?
+    var presenter: (any ReceiverPresenter<RootEffect, RootState>)?
     typealias PresenterState = RootState
     typealias Effect = RootEffect
     func receive(_: RootAction) async {}

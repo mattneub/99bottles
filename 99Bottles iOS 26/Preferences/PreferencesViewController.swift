@@ -1,6 +1,8 @@
 import UIKit
 
+/// Presenter of the Preferences module.
 final class PreferencesViewController: UIViewController, ReceiverPresenter {
+    /// Reference to the processor, set by the coordinator at module creation time.
     weak var processor: (any Receiver<PreferencesAction>)?
 
     @IBOutlet var autoplaySwitch: UISwitch!
@@ -23,6 +25,7 @@ final class PreferencesViewController: UIViewController, ReceiverPresenter {
         autoplaySwitch.isOn = state.autoplay
     }
 
+    /// Done button in nav bar.
     @objc func done() {
         let layout = pickerView.selectedRow(inComponent: 0)
         let autoplay = autoplaySwitch.isOn
@@ -31,6 +34,7 @@ final class PreferencesViewController: UIViewController, ReceiverPresenter {
         }
     }
 
+    /// Cancel button in nav bar.
     @objc func cancel() {
         Task {
             await processor?.receive(.cancel)
@@ -53,6 +57,7 @@ extension PreferencesViewController: UIPickerViewDataSource, UIPickerViewDelegat
     }
 }
 
+/// User might dismiss by dragging. This is equivalent to cancellation. Delegation set by coordinator.
 extension PreferencesViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         Task {

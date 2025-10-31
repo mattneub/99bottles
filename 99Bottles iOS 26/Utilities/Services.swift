@@ -6,6 +6,7 @@ final class Services {
     var bundle: BundleType = Bundle.main
     var persistence: PersistenceType = Persistence()
     var playerType: PlayerType.Type = Player.self
+    var stateMachineFactory: StateMachineFactoryType = StateMachineFactory()
     var userDefaults: UserDefaultsType = UserDefaults.standard
     var viewType: UIView.Type = UIView.self
 }

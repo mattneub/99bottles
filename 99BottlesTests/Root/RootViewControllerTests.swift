@@ -13,6 +13,18 @@ struct RootViewControllerTests {
         MockUIView.reset()
     }
 
+    @Test("bottles: returns wall view bottle layers")
+    func bottles() {
+        let bottle1 = BottleLayer(bottleNumber: 1, scale: 2, screenBounds: .zero)
+        let bottle2 = BottleLayer(bottleNumber: 12, scale: 2, screenBounds: .zero)
+        let wallView = subject.wallView
+        wallView.layer.addSublayer(bottle1)
+        wallView.layer.addSublayer(bottle2)
+        wallView.layer.addSublayer(CALayer())
+        let result = subject.bottles
+        #expect(result == [bottle1, bottle2])
+    }
+
     @Test("imageView is correctly constructed")
     func imageView() {
         let imageView = subject.imageView
@@ -31,7 +43,7 @@ struct RootViewControllerTests {
     func numberDisplay() {
         let numberDisplay = subject.numberDisplay
         #expect(numberDisplay.translatesAutoresizingMaskIntoConstraints == false)
-        #expect(numberDisplay.text == "99")
+        #expect(numberDisplay.text == "")
         #expect(numberDisplay.font == UIFont(name: "Helvetica", size: 144)!)
         #expect(numberDisplay.textColor == UIColor(red: 0.757, green: 0.396, blue: 0.673, alpha: 1))
         #expect(numberDisplay.shadowOffset == CGSize(width: 5, height: 4))
@@ -48,7 +60,7 @@ struct RootViewControllerTests {
         #expect(subject.wallView.superview === subject.view)
         #expect(subject.wallView.frame == subject.view.bounds.inset(by: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)))
         #expect(subject.numberDisplay.superview === subject.wallView)
-        #expect(subject.numberDisplay.center == CGPoint(x: subject.wallView.bounds.midX + 0.25, y: subject.wallView.bounds.midY))
+        #expect(subject.numberDisplay.center == CGPoint(x: subject.wallView.bounds.midX, y: subject.wallView.bounds.midY))
         let tapper = try #require(subject.view.gestureRecognizers?.first as? MyTapGestureRecognizer)
         #expect(tapper.target === subject)
         #expect(tapper.action == #selector(subject.tapped))
@@ -64,13 +76,28 @@ struct RootViewControllerTests {
         #expect(processor.thingsReceived == [.initialLayout])
     }
 
+    @Test("receive proposeBottle: picks a bottle layer at random, returns it with bottle count")
+    func proposeBottle() async {
+        let bottle1 = BottleLayer(bottleNumber: 1, scale: 2, screenBounds: .zero)
+        let bottle2 = BottleLayer(bottleNumber: 12, scale: 2, screenBounds: .zero)
+        let wallView = subject.wallView
+        wallView.layer.addSublayer(bottle1)
+        wallView.layer.addSublayer(bottle2)
+        await subject.receive(.proposeBottle)
+        let possibles: [[RootAction]] = [
+            [.proposeBottle(bottle1, count: 2)],
+            [.proposeBottle(bottle2, count: 2)],
+        ]
+        #expect(possibles.contains(processor.thingsReceived))
+    }
+
     @Test("receive startOver: removes all bottle layers, creates new bottle layout as specified")
     func startOver() async throws {
         makeWindow(viewController: subject)
         subject.loadViewIfNeeded()
         subject.view.layoutIfNeeded()
-        subject.wallView.layer.addSublayer(BottleLayer(bottleNumber: 1, scale: 2))
-        subject.wallView.layer.addSublayer(BottleLayer(bottleNumber: 1, scale: 2))
+        subject.wallView.layer.addSublayer(BottleLayer(bottleNumber: 1, scale: 2, screenBounds: .zero))
+        subject.wallView.layer.addSublayer(BottleLayer(bottleNumber: 1, scale: 2, screenBounds: .zero))
         await subject.receive(.startOver(BottleLayout.layouts[4]))
         let bottles = try #require(subject.wallView.layer.sublayers?.compactMap { $0 as? BottleLayer })
         #expect(bottles.count == BottleLayout.layouts[4].count)
@@ -80,6 +107,22 @@ struct RootViewControllerTests {
         // I can prove there was an animation, but I can't prove what it was
         #expect(MockUIView.methodsCalled.first == "animateAsync(withDuration:delay:options:animations:)")
         #expect(MockUIView.duration == 0.25)
+    }
+
+    @Test("receive updateLabel: uses bottle count to update numberDisplay label with animation")
+    func updateLabel() async {
+        subject.loadViewIfNeeded()
+        let bottle1 = BottleLayer(bottleNumber: 1, scale: 2, screenBounds: .zero)
+        let bottle2 = BottleLayer(bottleNumber: 12, scale: 2, screenBounds: .zero)
+        let wallView = subject.wallView
+        wallView.layer.addSublayer(bottle1)
+        wallView.layer.addSublayer(bottle2)
+        await subject.receive(.updateLabel)
+        #expect(subject.numberDisplay.text == "2")
+        #expect(MockUIView.methodsCalled.first == "transitionAsync(with:duration:options:animations:)")
+        #expect(MockUIView.view === subject.numberDisplay)
+        #expect(MockUIView.duration == 0.4)
+        #expect(MockUIView.options == .transitionFlipFromTop)
     }
 
     @Test("tapped: sends tapped")

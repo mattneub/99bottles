@@ -1,10 +1,12 @@
 import UIKit
 
+/// Keys used in user defaults.
 struct Defaults {
     static let layoutNumber = "layoutNumber"
     static let interactive = "interactive"
 }
 
+/// Public fact of our Persistence object, so we can mock it for testing.
 protocol PersistenceType {
     func setLayoutNumber(_: Int)
     func layoutNumber() -> Int
@@ -12,6 +14,7 @@ protocol PersistenceType {
     func interactive() -> Bool
 }
 
+/// Object that communicates with user defaults.
 struct Persistence: PersistenceType {
     func setLayoutNumber(_ number: Int) {
         services.userDefaults.set(number, forKey: Defaults.layoutNumber)

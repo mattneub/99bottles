@@ -1,5 +1,6 @@
 import UIKit
 
+/// Services global object is rooted here.
 @MainActor
 var services = Services()
 
