@@ -127,8 +127,34 @@ struct RootViewControllerTests {
 
     @Test("tapped: sends tapped")
     func tapped() async {
-        subject.tapped()
+        let gestureRecognizer = UITapGestureRecognizer()
+        subject.tapped(gestureRecognizer)
         await #while(processor.thingsReceived.isEmpty)
-        #expect(processor.thingsReceived == [.tapped])
+        #expect(processor.thingsReceived == [.tapped(nil)])
+    }
+
+    @Test("tapped: if location is in a bottle layer, sends tapped with bottle layer")
+    func tappedBottle() async {
+        makeWindow(viewController: subject)
+        subject.loadViewIfNeeded()
+        subject.view.layoutIfNeeded()
+        subject.wallView.layer.addSublayer(BottleLayer(bottleNumber: 1, scale: 2, screenBounds: .zero))
+        subject.wallView.layer.addSublayer(BottleLayer(bottleNumber: 1, scale: 2, screenBounds: .zero))
+        await subject.receive(.startOver(BottleLayout.layouts[BottleLayout.layouts.count - 1])) // one big bottle
+        let bottle = subject.bottles[0]
+        processor.thingsReceived = []
+        // that was prep, here comes the test
+        subject.tapped(MyGestureRecognizer()) // taps in middle of screen, where our one big bottle is
+        await #while(processor.thingsReceived.isEmpty)
+        #expect(processor.thingsReceived == [.tapped(bottle)])
+    }
+}
+
+fileprivate final class MyGestureRecognizer: UITapGestureRecognizer {
+    override func location(in view: UIView?) -> CGPoint {
+        if let view {
+            return CGPoint(x: view.bounds.midX, y: view.bounds.midY) // tee-hee
+        }
+        return .zero
     }
 }

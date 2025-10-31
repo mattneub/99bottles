@@ -25,13 +25,22 @@ final class RootProcessor: Processor {
             state.currentBottle = bottle
             state.count = count
             await startSinging()
-        case .tapped:
-            await tapped()
+        case .tapped(let bottle):
+            await tapped(bottle)
         }
     }
 
     /// The user has tapped the background. Display the action sheet and do what the user chooses.
-    func tapped() async {
+    /// But if this happened while we were paused waiting for the user to pick a bottle,
+    /// then resume singing, with this bottle as our bottle (replacing the originally
+    /// proposed bottle).
+    func tapped(_ bottle: BottleLayer?) async {
+        if stateMachine?.currentState is WaitingForTap, let bottle = bottle {
+            state.currentBottle = bottle
+            let newState = stateMachine?.proceedToNextState()
+            try? await driveStateMachine(state: newState)
+            return
+        }
         let result = await coordinator?.showActionSheet(
             title: nil,
             titles: [
@@ -55,23 +64,20 @@ final class RootProcessor: Processor {
         }
     }
 
-    /// We have a bottle and a number of bottles. If there is currently no state machine,
-    /// make one and start it going.
+    /// Called by .proposeBottle. We have a bottle and a number of bottles. Start the verse.
     func startSinging() async {
-        if stateMachine == nil {
-            stateMachine = services.stateMachineFactory.makeStateMachine(
-                bottleNumber: state.count,
-                interactive: false // TODO: need to get this from persistence
-            )
-            let firstState = stateMachine?.proceedToNextState()
-            try? await unlessTesting {
-                try? await Task.sleep(for: .seconds(0.5))
-            }
-            try? await driveStateMachine(state: firstState)
+        stateMachine = services.stateMachineFactory.makeStateMachine(
+            bottleNumber: state.count,
+            interactive: services.persistence.interactive()
+        )
+        let firstState = stateMachine?.proceedToNextState()
+        try? await unlessTesting {
+            try? await Task.sleep(for: .seconds(0.5))
         }
+        try? await driveStateMachine(state: firstState)
     }
 
-    /// Subroutine of `startSinging`. This is the heart of the app! Cycle through the successive
+    /// Called by `startSinging` and also by `tapped`. Cycle through the successive
     /// states of the state machine, singing as we go. When we reach the last state, this means
     /// we have finished one verse of the song: we have sung about one bottle, and the states
     /// have _removed_ that bottle. So update the interface and ask for a new bottle to sing about.
@@ -80,8 +86,11 @@ final class RootProcessor: Processor {
         while stateMachineState != nil {
             try await (stateMachineState as? SingerType)?.sing(bottleLayer: self.state.currentBottle)
             stateMachineState = stateMachine?.proceedToNextState()
+            if stateMachineState is WaitingForTap {
+                return // stop! it's up to the user to set us going again
+            }
         }
-        stateMachine = nil
+        // ok, state machine state is nil, the verse is over! start the next verse
         await presenter?.receive(.updateLabel)
         if self.state.count > 1 {
             await presenter?.receive(.proposeBottle)

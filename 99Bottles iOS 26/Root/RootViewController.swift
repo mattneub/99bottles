@@ -153,9 +153,13 @@ final class RootViewController: UIViewController, ReceiverPresenter {
     }
 
     /// The user has tapped the background.
-    @objc func tapped() {
+    @objc func tapped(_ gestureRecognizer: UIGestureRecognizer) {
+        // User might or might not have tapped on a bottle, and we might or might not care
+        // about this. So just in case, report the bottle and let the processor decide.
+        let location = gestureRecognizer.location(in: view) // wallView's superview -> superLayer
+        let bottleLayer = wallView.layer.hitTest(location) as? BottleLayer
         Task {
-            await processor?.receive(.tapped)
+            await processor?.receive(.tapped(bottleLayer))
         }
     }
 }
