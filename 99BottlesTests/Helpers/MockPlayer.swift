@@ -13,4 +13,8 @@ final class MockPlayer: NSObject, PlayerType {
         methodsCalled.append(#function)
     }
 
+    func stop() {
+        methodsCalled.append(#function)
+    }
+
 }

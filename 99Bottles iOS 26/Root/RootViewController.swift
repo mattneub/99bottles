@@ -5,6 +5,17 @@ final class RootViewController: UIViewController, ReceiverPresenter {
     /// Reference to the processor, set by coordinator at module creation time.
     weak var processor: (any Receiver<RootAction>)?
 
+    override var prefersStatusBarHidden: Bool { true }
+
+    /// Observer so that the processor can respond to scene deactivation.
+    lazy var observer = NotificationCenter.default.addObserver(
+        for: UIScene.WillDeactivateMessage.self
+    ) { [weak self] _ in
+        Task {
+            await self?.processor?.receive(.deactivate)
+        }
+    }
+
     /// Background of the screen.
     lazy var imageView = UIImageView().applying {
         $0.translatesAutoresizingMaskIntoConstraints = false
@@ -59,6 +70,8 @@ final class RootViewController: UIViewController, ReceiverPresenter {
 
         let tapper = MyTapGestureRecognizer(target: self, action: #selector(tapped))
         view.addGestureRecognizer(tapper)
+
+        let _ = observer // lazy instantiation
     }
 
     private var didInitialSetup = false
@@ -81,6 +94,9 @@ final class RootViewController: UIViewController, ReceiverPresenter {
             }
         case .proposeBottle:
             let bottles = self.bottles
+            guard bottles.count > 0 else {
+                return
+            }
             let layerNumber = Int.random(in: 0..<bottles.count)
             await processor?.receive(.proposeBottle(bottles[layerNumber], count: bottles.count))
         case .startOver(let layout):

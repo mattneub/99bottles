@@ -23,6 +23,8 @@ final class RootProcessor: Processor {
 
     func receive(_ action: RootAction) async {
         switch action {
+        case .deactivate:
+            await stopEverything()
         case .initialLayout:
             let layoutIndex = services.persistence.layoutNumber()
             let layout = BottleLayout.layouts[layoutIndex]
@@ -49,8 +51,7 @@ final class RootProcessor: Processor {
             return
         }
         // stop everything you're doing...
-        loopingTask?.cancel()
-        await presenter?.receive(.cancelAnimations)
+        await stopEverything()
         // ... and show the action sheet
         let result = await coordinator?.showActionSheet(
             title: nil,
@@ -120,6 +121,14 @@ final class RootProcessor: Processor {
                 await presenter?.receive(.proposeBottle)
             }
         }
+    }
+
+    /// Stop driving the state machine, stop singing, stop animating a bottle.
+    /// Basically bring the entire app to a silent halt.
+    func stopEverything() async {
+        loopingTask?.cancel()
+        (stateMachine?.currentState as? SingerType)?.stop()
+        await presenter?.receive(.cancelAnimations)
     }
 
     /// Actions of the action sheet.

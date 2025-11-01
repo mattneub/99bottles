@@ -19,11 +19,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func bootstrap(scene: UIWindowScene) {
+        services.audioSessionWrapper.configure()
         let window = UIWindow(windowScene: scene)
         self.window = window
         coordinator.createInterface(window: window)
         window.makeKeyAndVisible()
     }
 
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        services.audioSessionWrapper.activate()
+    }
 }
 

@@ -3,6 +3,7 @@ import AVFoundation
 
 final class Services {
     var audioPlayerType: AudioPlayerType.Type = AVAudioPlayer.self
+    var audioSessionWrapper: AudioSessionWrapperType = AudioSessionWrapper()
     var bundle: BundleType = Bundle.main
     var persistence: PersistenceType = Persistence()
     var playerType: PlayerType.Type = Player.self

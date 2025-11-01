@@ -22,6 +22,18 @@ struct RootProcessorTests {
         services.stateMachineFactory = stateMachineFactory
     }
 
+    @Test("deactivate: stop looping, singing, animating")
+    func deactivate() async {
+        subject.loopingTask = Task { try? await Task.sleep(for: .seconds(4)) }
+        subject.stateMachine = stateMachine
+        let singer = Moe()
+        stateMachine.currentState = singer
+        await subject.receive(.deactivate)
+        #expect(subject.loopingTask?.isCancelled == true)
+        #expect(singer.methodsCalled == ["stop()"])
+        #expect(presenter.thingsReceived == [.cancelAnimations])
+    }
+
     @Test("initialLayout: get layout number from persistence, sends startOver and proposeBottle")
     func initialLayout() async {
         persistence.layoutToReturn = 4
@@ -111,12 +123,16 @@ struct RootProcessorTests {
         #expect(manny.methodsCalled == [])
     }
 
-    @Test("tapped: cancels looping task, cancels animation, constructs and sends coordinator showActionSheet")
+    @Test("tapped: cancels looping task, stops singing, cancels animation, constructs and sends coordinator showActionSheet")
     func tapped() async {
         coordinator.actionToReturn = nil
         subject.loopingTask = Task { try await Task.sleep(for: .seconds(1)) }
+        subject.stateMachine = stateMachine
+        let singer = Moe()
+        stateMachine.currentState = singer
         await subject.receive(.tapped(nil))
         #expect(subject.loopingTask?.isCancelled == true)
+        #expect(singer.methodsCalled == ["stop()"])
         #expect(presenter.thingsReceived == [.cancelAnimations])
         #expect(coordinator.methodsCalled == ["showActionSheet(title:titles:userInfos:)"])
         #expect(coordinator.title == nil)
@@ -138,8 +154,12 @@ struct RootProcessorTests {
         stateMachine.currentState = Singer(bottleNumber: 1, interactive: false, verse: [.init(sound: "howdy")])
         subject.stateMachine = stateMachine
         subject.loopingTask = Task { try await Task.sleep(for: .seconds(1)) }
+        subject.stateMachine = stateMachine
+        let singer = Moe()
+        stateMachine.currentState = singer
         await subject.receive(.tapped(BottleLayer(bottleNumber: 2, scale: 2, screenBounds: .zero)))
         #expect(subject.loopingTask?.isCancelled == true)
+        #expect(singer.methodsCalled == ["stop()"])
         #expect(presenter.thingsReceived == [.cancelAnimations])
         #expect(coordinator.methodsCalled == ["showActionSheet(title:titles:userInfos:)"])
     }
@@ -150,8 +170,12 @@ struct RootProcessorTests {
         stateMachine.currentState = WaitingForTap(bottleNumber: 2, interactive: false, verse: [.init(sound: "howdy")])
         subject.stateMachine = stateMachine
         subject.loopingTask = Task { try await Task.sleep(for: .seconds(1)) }
+        subject.stateMachine = stateMachine
+        let singer = Moe()
+        stateMachine.currentState = singer
         await subject.receive(.tapped(nil))
         #expect(subject.loopingTask?.isCancelled == true)
+        #expect(singer.methodsCalled == ["stop()"])
         #expect(presenter.thingsReceived == [.cancelAnimations])
         #expect(coordinator.methodsCalled == ["showActionSheet(title:titles:userInfos:)"])
     }

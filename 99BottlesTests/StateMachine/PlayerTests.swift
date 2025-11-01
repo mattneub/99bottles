@@ -33,4 +33,18 @@ struct PlayerTests {
         subject.audioPlayerDidFinishPlaying(AVAudioPlayer(), successfully: true)
         #expect(subject.continuation == nil)
     }
+
+    @Test("stop: calls audio player stop; resumes continuation")
+    func stop() async throws {
+        let subject = try Player(soundFile: URL(string: "file://yoho")!)
+        let audioPlayer = try #require(subject.audioPlayer as? MockAudioPlayer)
+        Task {
+            await subject.playAsync()
+        }
+        await #while(subject.continuation == nil)
+        #expect(subject.continuation != nil)
+        subject.stop()
+        #expect(audioPlayer.methodsCalled.last == "stop()")
+        #expect(subject.continuation == nil)
+    }
 }

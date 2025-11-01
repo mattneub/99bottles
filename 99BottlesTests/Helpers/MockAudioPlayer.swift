@@ -23,4 +23,8 @@ final class MockAudioPlayer: NSObject, AudioPlayerType {
         return true
     }
 
+    func stop() {
+        methodsCalled.append(#function)
+    }
+
 }

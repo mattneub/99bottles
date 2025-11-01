@@ -1,5 +1,7 @@
 /// Messages from the presenter to the processor.
 enum RootAction: Equatable {
+    /// The app is deactivating.
+    case deactivate
 
     /// Ready for initial layout.
     case initialLayout

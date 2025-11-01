@@ -4,6 +4,7 @@ import AVFoundation
 protocol PlayerType: NSObject, AVAudioPlayerDelegate {
     init(soundFile: URL) throws
     func playAsync() async
+    func stop()
 }
 
 /// Object that plays a sound file in a way that you can wait for with async/await.
@@ -27,6 +28,12 @@ final class Player: NSObject, @MainActor PlayerType {
             self.continuation = continuation
             audioPlayer.play()
         }
+    }
+
+    func stop() {
+        audioPlayer.stop()
+        continuation?.resume(returning: ())
+        continuation = nil
     }
 }
 

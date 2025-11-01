@@ -20,6 +20,9 @@ final class Moe: @MainActor SingerType {
         methodsCalled.append(#function)
         self.bottleLayer = bottleLayer
     }
+    func stop() {
+        methodsCalled.append(#function)
+    }
 }
 
 final class Jack: StateType {

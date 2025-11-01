@@ -30,6 +30,18 @@ struct SingerTests {
         #expect(player.methodsCalled == ["playAsync()"])
     }
 
+    @Test("stop: calls player stop")
+    func stop() throws {
+        let subject = Singer(bottleNumber: 42, interactive: true, verse: [
+            .init(sound: "howdy", pauseAfterwards: true),
+            .init(sound: "there"),
+        ])
+        let player = try MockPlayer(soundFile: URL(string: "file://yoho")!)
+        subject.player = player
+        subject.stop()
+        #expect(player.methodsCalled == ["stop()"])
+    }
+
     @Test("nextState: is another Singer")
     func nextState() throws {
         let subject = Singer(bottleNumber: 42, interactive: true, verse: [

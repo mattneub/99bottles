@@ -1,8 +1,9 @@
 import Foundation
 
-/// A Singer is a State plus a `sing` method.
+/// A Singer is a State plus a `sing` method (and a `stop` method).
 protocol SingerType: StateType {
     func sing(bottleLayer: BottleLayer?) async throws
+    func stop()
 }
 
 extension SingerType {
@@ -44,6 +45,10 @@ final class Singer: SingerType {
         }
         self.player = try services.playerType.init(soundFile: url)
         await player?.playAsync()
+    }
+
+    func stop() {
+        player?.stop()
     }
 
     func nextState() -> (any StateType)? {

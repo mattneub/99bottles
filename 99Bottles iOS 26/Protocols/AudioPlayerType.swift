@@ -7,6 +7,7 @@ protocol AudioPlayerType: AnyObject {
     init(contentsOf: URL, fileTypeHint: String?) throws
     @discardableResult func prepareToPlay() -> Bool
     @discardableResult func play() -> Bool
+    func stop()
 }
 
 extension AVAudioPlayer: AudioPlayerType {}

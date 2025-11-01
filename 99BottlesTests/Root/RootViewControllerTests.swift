@@ -66,6 +66,15 @@ struct RootViewControllerTests {
         #expect(tapper.action == #selector(subject.tapped))
     }
 
+    @Test("viewDidLoad: sets up notification observer")
+    func viewDidLoadNotification() async throws {
+        subject.loadViewIfNeeded()
+        let scene = try #require(UIApplication.shared.connectedScenes.first as? UIWindowScene)
+        NotificationCenter.default.post(UIScene.WillDeactivateMessage(scene: scene), subject: scene)
+        await #while(processor.thingsReceived.isEmpty)
+        #expect(processor.thingsReceived == [.deactivate])
+    }
+
     @Test("viewDidLayoutSubviews: sends initialLayout, first time only")
     func didLayout() async {
         subject.viewDidLayoutSubviews()
@@ -103,6 +112,12 @@ struct RootViewControllerTests {
         #expect(possibles.contains(processor.thingsReceived))
     }
 
+    @Test("receive proposeBottle: if no bottles, does nothing")
+    func proposeBottleNoBottles() async {
+        await subject.receive(.proposeBottle)
+        #expect(processor.thingsReceived.isEmpty)
+    }
+
     @Test("receive startOver: removes all bottle layers, creates new bottle layout as specified")
     func startOver() async throws {
         makeWindow(viewController: subject)
@@ -114,7 +129,7 @@ struct RootViewControllerTests {
         let bottles = try #require(subject.wallView.layer.sublayers?.compactMap { $0 as? BottleLayer })
         #expect(bottles.count == BottleLayout.layouts[4].count)
         #expect(bottles[0].frame.origin == CGPoint(x: 2, y: 2))
-        #expect(bottles[0].frame.integral.size == CGSize(width: 45, height: 63)) // close enough
+        #expect(bottles[0].frame.integral.size == CGSize(width: 45, height: 65)) // close enough
         #expect(subject.numberDisplay.text == String(bottles.count))
         // I can prove there was an animation, but I can't prove what it was
         #expect(MockUIView.methodsCalled.first == "animateAsync(withDuration:delay:options:animations:)")
