@@ -11,4 +11,8 @@ final class MockBottleLayer: BottleLayer {
     override func flyAway() {
         methodsCalled.append(#function)
     }
+
+    override func removeAllAnimations() {
+        methodsCalled.append(#function)
+    }
 }

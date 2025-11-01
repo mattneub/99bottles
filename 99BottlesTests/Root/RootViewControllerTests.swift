@@ -76,6 +76,18 @@ struct RootViewControllerTests {
         #expect(processor.thingsReceived == [.initialLayout])
     }
 
+    @Test("receive cancelAnimations: sends removeAllAnimations to all bottles")
+    func cancelAnimations() async {
+        let bottle1 = MockBottleLayer(bottleNumber: 1, scale: 2, screenBounds: .zero)
+        let bottle2 = MockBottleLayer(bottleNumber: 12, scale: 2, screenBounds: .zero)
+        let wallView = subject.wallView
+        wallView.layer.addSublayer(bottle1)
+        wallView.layer.addSublayer(bottle2)
+        await subject.receive(.cancelAnimations)
+        #expect(bottle1.methodsCalled == ["removeAllAnimations()"])
+        #expect(bottle2.methodsCalled == ["removeAllAnimations()"])
+    }
+
     @Test("receive proposeBottle: picks a bottle layer at random, returns it with bottle count")
     func proposeBottle() async {
         let bottle1 = BottleLayer(bottleNumber: 1, scale: 2, screenBounds: .zero)
@@ -123,6 +135,20 @@ struct RootViewControllerTests {
         #expect(MockUIView.view === subject.numberDisplay)
         #expect(MockUIView.duration == 0.4)
         #expect(MockUIView.options == .transitionFlipFromTop)
+    }
+
+    @Test("receive updateLabel: if bottle count matches numberDisplay label, does nothing")
+    func updateLabelNoChange() async {
+        subject.loadViewIfNeeded()
+        let bottle1 = BottleLayer(bottleNumber: 1, scale: 2, screenBounds: .zero)
+        let bottle2 = BottleLayer(bottleNumber: 12, scale: 2, screenBounds: .zero)
+        let wallView = subject.wallView
+        wallView.layer.addSublayer(bottle1)
+        wallView.layer.addSublayer(bottle2)
+        subject.numberDisplay.text = "2"
+        await subject.receive(.updateLabel)
+        #expect(subject.numberDisplay.text == "2")
+        #expect(MockUIView.methodsCalled.isEmpty)
     }
 
     @Test("tapped: sends tapped")

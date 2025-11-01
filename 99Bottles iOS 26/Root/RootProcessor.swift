@@ -8,11 +8,18 @@ final class RootProcessor: Processor {
     /// Reference to the presenter, set by coordinator at module creation time.
     weak var presenter: (any ReceiverPresenter<RootEffect, RootState>)?
 
+    /// Trampoline so we can send actions to ourself.
+    lazy var trampoline: any RootTrampolineType = RootTrampoline(processor: self)
+
     /// State to be presented for display, but in fact we use it only as a scratchpad.
     var state = RootState()
 
     /// State machine that drives the progress of the app's behavior.
     var stateMachine: (any StateMachineType)?
+
+    /// The task that loops to drive the state machine. It is exposed here so that we can cancel it
+    /// when the user taps on the screen and we show the action sheet.
+    var loopingTask: (Task<(), any Error>)?
 
     func receive(_ action: RootAction) async {
         switch action {
@@ -38,9 +45,13 @@ final class RootProcessor: Processor {
         if stateMachine?.currentState is WaitingForTap, let bottle = bottle {
             state.currentBottle = bottle
             let newState = stateMachine?.proceedToNextState()
-            try? await driveStateMachine(state: newState)
+            await driveStateMachine(state: newState)
             return
         }
+        // stop everything you're doing...
+        loopingTask?.cancel()
+        await presenter?.receive(.cancelAnimations)
+        // ... and show the action sheet
         let result = await coordinator?.showActionSheet(
             title: nil,
             titles: [
@@ -54,10 +65,14 @@ final class RootProcessor: Processor {
                 ["result": TapAction.preferences]
             ]
         )
+        // respond to the action sheet
         if let result = result as? MyAlertAction, let action = result.userInfo?["result"] as? TapAction {
             switch action {
-            case .resume: break
-            case .startOver: break
+            case .resume:
+                await presenter?.receive(.updateLabel)
+                await presenter?.receive(.proposeBottle) // start this verse from the top
+            case .startOver:
+                await trampoline.startOver() // start the whole song from the top
             case .preferences:
                 coordinator?.showPreferences()
             }
@@ -74,26 +89,36 @@ final class RootProcessor: Processor {
         try? await unlessTesting {
             try? await Task.sleep(for: .seconds(0.5))
         }
-        try? await driveStateMachine(state: firstState)
+        await driveStateMachine(state: firstState)
     }
 
     /// Called by `startSinging` and also by `tapped`. Cycle through the successive
     /// states of the state machine, singing as we go. When we reach the last state, this means
     /// we have finished one verse of the song: we have sung about one bottle, and the states
     /// have _removed_ that bottle. So update the interface and ask for a new bottle to sing about.
-    func driveStateMachine(state stateMachineState: (any StateType)?) async throws {
-        var stateMachineState = stateMachineState
-        while stateMachineState != nil {
-            try await (stateMachineState as? SingerType)?.sing(bottleLayer: self.state.currentBottle)
-            stateMachineState = stateMachine?.proceedToNextState()
-            if stateMachineState is WaitingForTap {
-                return // stop! it's up to the user to set us going again
+    func driveStateMachine(state stateMachineState: (any StateType)?) async {
+        let task = Task {
+            var stateMachineState = stateMachineState
+            while stateMachineState != nil {
+                try await (stateMachineState as? SingerType)?.sing(bottleLayer: self.state.currentBottle)
+                stateMachineState = stateMachine?.proceedToNextState()
+                if stateMachineState is WaitingForTap {
+                    throw Exit.exit // stop! it's up to the user to set us going again
+                }
+                try Task.checkCancellation()
             }
         }
-        // ok, state machine state is nil, the verse is over! start the next verse
+        self.loopingTask = task // expose the task to make it cancellable from outside
+        let result = await task.result
+        if case .failure = result {
+            return // the task was cancelled, bow out
+        }
+        // the verse has completed in good order; start the next verse (unless we're out of bottles)
         await presenter?.receive(.updateLabel)
         if self.state.count > 1 {
-            await presenter?.receive(.proposeBottle)
+            Task { // break the chain
+                await presenter?.receive(.proposeBottle)
+            }
         }
     }
 
@@ -103,6 +128,11 @@ final class RootProcessor: Processor {
         case startOver
         case preferences
     }
+
+    /// Error enum, so we can cancel the looping task from within.
+    enum Exit: Error {
+        case exit
+    }
 }
 
 /// The Preferences have been dismissed. Respond.
@@ -110,6 +140,6 @@ extension RootProcessor: PreferencesDelegate {
     func cancel() async {}
 
     func done() async {
-        await receive(.initialLayout)
+        await trampoline.startOver()
     }
 }

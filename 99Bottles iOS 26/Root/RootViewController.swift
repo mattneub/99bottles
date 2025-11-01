@@ -75,6 +75,10 @@ final class RootViewController: UIViewController, ReceiverPresenter {
 
     func receive(_ effect: RootEffect) async {
         switch effect {
+        case .cancelAnimations:
+            self.bottles.forEach {
+                $0.removeAllAnimations()
+            }
         case .proposeBottle:
             let bottles = self.bottles
             let layerNumber = Int.random(in: 0..<bottles.count)
@@ -98,14 +102,17 @@ final class RootViewController: UIViewController, ReceiverPresenter {
                 snapshotView.removeFromSuperview()
             }
         case .updateLabel:
-            await services.viewType.transitionAsync(
-                with: numberDisplay,
-                duration: 0.4,
-                options: .transitionFlipFromTop,
-                animations: { [self] in
-                    numberDisplay.text = String(bottles.count)
-                }
-            )
+            let count = String(bottles.count)
+            if numberDisplay.text != count {
+                await services.viewType.transitionAsync(
+                    with: numberDisplay,
+                    duration: 0.4,
+                    options: .transitionFlipFromTop,
+                    animations: { [self] in
+                        numberDisplay.text = count
+                    }
+                )
+            }
         }
     }
 

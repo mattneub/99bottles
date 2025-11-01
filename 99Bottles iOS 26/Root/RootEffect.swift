@@ -1,6 +1,9 @@
 /// Transient messages sent from processor to presenter.
 enum RootEffect: Equatable {
 
+    /// Stop animating any bottles.
+    case cancelAnimations
+
     /// I need you to pick a bottle and tell me how many bottles there are.
     case proposeBottle
 
