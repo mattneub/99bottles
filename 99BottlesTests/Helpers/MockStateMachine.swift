@@ -4,7 +4,7 @@ final class MockStateMachine: StateMachineType {
     var methodsCalled = [String]()
     var statesToReturn = [(any StateType)?]()
     var currentState: (any StateType)?
-    var bottleNumber: Int?
+    var howManyBottles: Int?
     var interactive: Bool?
 
     func proceedToNextState() -> (any StateType)? {

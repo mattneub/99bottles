@@ -14,11 +14,12 @@ final class RootProcessor: Processor {
     /// State to be presented for display, but in fact we use it only as a scratchpad.
     var state = RootState()
 
-    /// State machine that drives the progress of the app's behavior.
+    /// State machine that drives the progress of each verse of the song.
     var stateMachine: (any StateMachineType)?
 
-    /// The task that loops to drive the state machine. It is exposed here so that we can cancel it
-    /// when the user taps on the screen and we show the action sheet.
+    /// Task that loops to drive the state machine. It is exposed here so that we can cancel it,
+    /// e.g., when the user taps on the screen and we show the action sheet, or when the app
+    /// deactivates.
     var loopingTask: (Task<(), any Error>)?
 
     func receive(_ action: RootAction) async {
@@ -41,10 +42,11 @@ final class RootProcessor: Processor {
 
     /// The user has tapped the background. Display the action sheet and do what the user chooses.
     /// But if this happened while we were paused waiting for the user to pick a bottle,
-    /// then resume singing, with this bottle as our bottle (replacing the originally
+    /// then instead, resume singing, with this bottle as our bottle (replacing the originally
     /// proposed bottle).
     func tapped(_ bottle: BottleLayer?) async {
         if stateMachine?.currentState is WaitingForTap, let bottle = bottle {
+            // resume singing
             state.currentBottle = bottle
             let newState = stateMachine?.proceedToNextState()
             await driveStateMachine(state: newState)
@@ -70,20 +72,22 @@ final class RootProcessor: Processor {
         if let result = result as? MyAlertAction, let action = result.userInfo?["result"] as? TapAction {
             switch action {
             case .resume:
+                // start this verse from the top
                 await presenter?.receive(.updateLabel)
-                await presenter?.receive(.proposeBottle) // start this verse from the top
+                await presenter?.receive(.proposeBottle)
             case .startOver:
-                await trampoline.startOver() // start the whole song from the top
+                // start the whole song from the top
+                await trampoline.startOver()
             case .preferences:
                 coordinator?.showPreferences()
             }
         }
     }
 
-    /// Called by .proposeBottle. We have a bottle and a number of bottles. Start the verse.
+    /// Called by .proposeBottle. We have a bottle and the number of bottles. Start the verse.
     func startSinging() async {
         stateMachine = services.stateMachineFactory.makeStateMachine(
-            bottleNumber: state.count,
+            howManyBottles: state.count,
             interactive: services.persistence.interactive()
         )
         let firstState = stateMachine?.proceedToNextState()
@@ -94,7 +98,7 @@ final class RootProcessor: Processor {
     }
 
     /// Called by `startSinging` and also by `tapped`. Cycle through the successive
-    /// states of the state machine, singing as we go. When we reach the last state, this means
+    /// states of the state machine, singing as we go. When we reach a nil state, this means
     /// we have finished one verse of the song: we have sung about one bottle, and the states
     /// have _removed_ that bottle. So update the interface and ask for a new bottle to sing about.
     func driveStateMachine(state stateMachineState: (any StateType)?) async {
@@ -112,19 +116,19 @@ final class RootProcessor: Processor {
         self.loopingTask = task // expose the task to make it cancellable from outside
         let result = await task.result
         if case .failure = result {
-            return // the task was cancelled, bow out
+            return // task threw, bow out
         }
         // the verse has completed in good order; start the next verse (unless we're out of bottles)
         await presenter?.receive(.updateLabel)
         if self.state.count > 1 {
-            Task { // break the chain
+            Task { // break the chain! otherwise we'd build up a huge recursive call stack
                 await presenter?.receive(.proposeBottle)
             }
         }
     }
 
     /// Stop driving the state machine, stop singing, stop animating a bottle.
-    /// Basically bring the entire app to a silent halt.
+    /// Basically bring the entire app to a halt.
     func stopEverything() async {
         loopingTask?.cancel()
         (stateMachine?.currentState as? SingerType)?.stop()

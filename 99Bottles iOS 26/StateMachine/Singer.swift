@@ -1,11 +1,13 @@
 import Foundation
 
-/// A Singer is a State plus a `sing` method (and a `stop` method).
+/// A Singer is a State plus a `sing` method (and a `stop` method). It is how we actually
+/// sing and dance.
 protocol SingerType: StateType {
     func sing(bottleLayer: BottleLayer?) async throws
     func stop()
 }
 
+/// Extension so client can call `sing` with no bottle layer argument.
 extension SingerType {
     func sing() async throws {
         try await sing(bottleLayer: nil)
@@ -15,14 +17,14 @@ extension SingerType {
 /// Stage two! This is the object that knows how to sing one phrase —
 /// namely, the first phrase in its `verse`.
 final class Singer: SingerType {
-    let bottleNumber: Int
+    let howManyBottles: Int
     let interactive: Bool
     var verse: [Phrase]
     var player: (any PlayerType)?
     var pauseAfterwards: Bool = false
 
-    init(bottleNumber: Int, interactive: Bool, verse: [Phrase]) {
-        self.bottleNumber = bottleNumber
+    init(howManyBottles: Int, interactive: Bool, verse: [Phrase]) {
+        self.howManyBottles = howManyBottles
         self.interactive = interactive
         self.verse = verse
     }
@@ -40,9 +42,11 @@ final class Singer: SingerType {
         ) else {
             return // shouldn't happen
         }
+        // if there is a dance, do the dance
         if let bottleLayer {
             phrase.action?(bottleLayer)
         }
+        // and sing the song, and don't return until it ends
         self.player = try services.playerType.init(soundFile: url)
         await player?.playAsync()
     }
@@ -53,11 +57,11 @@ final class Singer: SingerType {
 
     func nextState() -> (any StateType)? {
         guard verse.count > 0 else {
-            return nil // the verse is over!
+            return nil // the entire verse is over!
         }
         if pauseAfterwards {
-            return WaitingForTap(bottleNumber: bottleNumber, interactive: interactive, verse: verse)
+            return WaitingForTap(howManyBottles: howManyBottles, interactive: interactive, verse: verse)
         }
-        return Singer(bottleNumber: bottleNumber, interactive: interactive, verse: verse)
+        return Singer(howManyBottles: howManyBottles, interactive: interactive, verse: verse)
     }
 }

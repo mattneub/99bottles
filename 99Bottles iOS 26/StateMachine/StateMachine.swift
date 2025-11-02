@@ -14,8 +14,8 @@ final class StateMachine: StateMachineType {
     /// Private in order to force the client to use the StateMachineFactory to make a state machine.
     /// This is so that we can test the client's interaction with the state machine by injecting
     /// a mock.
-    fileprivate init(bottleNumber: Int, interactive: Bool) {
-        self.currentState = Preparer(bottleNumber: bottleNumber, interactive: interactive)
+    fileprivate init(howManyBottles: Int, interactive: Bool) {
+        self.currentState = Preparer(howManyBottles: howManyBottles, interactive: interactive)
     }
 
     func proceedToNextState() -> (any StateType)? {
@@ -27,11 +27,11 @@ final class StateMachine: StateMachineType {
 /// A state machine factory is a simple object that makes a state machine. We use this architecture
 /// so that we can inject our own state machine mock for testing purposes.
 protocol StateMachineFactoryType {
-    func makeStateMachine(bottleNumber: Int, interactive: Bool) -> any StateMachineType
+    func makeStateMachine(howManyBottles: Int, interactive: Bool) -> any StateMachineType
 }
 
 struct StateMachineFactory: StateMachineFactoryType {
-    func makeStateMachine(bottleNumber: Int, interactive: Bool) -> any StateMachineType {
-        StateMachine(bottleNumber: bottleNumber, interactive: interactive)
+    func makeStateMachine(howManyBottles: Int, interactive: Bool) -> any StateMachineType {
+        StateMachine(howManyBottles: howManyBottles, interactive: interactive)
     }
 }

@@ -2,7 +2,7 @@
 /// method that generates all the legal layouts.
 struct BottleLayout: Equatable, Codable {
     /// How many bottles in the layout?
-    let count: Int // TODO: Turn this into a computed property, no?
+    var count: Int { rows * cols }
 
     /// How many rows in the layout?
     let rows: Int
@@ -44,7 +44,7 @@ struct BottleLayout: Equatable, Codable {
         let result = Array(dictionary)
             .sorted { $0.key > $1.key }
             .map {
-                BottleLayout(count: $0.key, rows: $0.value.rows, cols: $0.value.cols)
+                BottleLayout(rows: $0.value.rows, cols: $0.value.cols)
             }
         return result
     }()

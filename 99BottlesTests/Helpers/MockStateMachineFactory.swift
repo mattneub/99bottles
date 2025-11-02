@@ -3,8 +3,8 @@
 final class MockStateMachineFactory: StateMachineFactoryType {
     var stateMachineToMake = MockStateMachine() // placeholder; client should inject replacement
 
-    func makeStateMachine(bottleNumber: Int, interactive: Bool) -> any StateMachineType {
-        stateMachineToMake.bottleNumber = bottleNumber
+    func makeStateMachine(howManyBottles: Int, interactive: Bool) -> any StateMachineType {
+        stateMachineToMake.howManyBottles = howManyBottles
         stateMachineToMake.interactive = interactive
         return stateMachineToMake
     }

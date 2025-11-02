@@ -51,7 +51,7 @@ struct RootProcessorTests {
         #expect(subject.loopingTask != nil)
         let taskResult = await subject.loopingTask!.result
         #expect(try taskResult.get() == ())
-        #expect(stateMachine.bottleNumber == 4)
+        #expect(stateMachine.howManyBottles == 4)
         #expect(stateMachine.interactive == false)
         #expect(stateMachine.methodsCalled == ["proceedToNextState()"])
         #expect(subject.state.currentBottle === bottleLayer)
@@ -70,7 +70,7 @@ struct RootProcessorTests {
         #expect(subject.loopingTask != nil)
         let taskResult = await subject.loopingTask!.result
         #expect(try taskResult.get() == ())
-        #expect(stateMachine.bottleNumber == 4)
+        #expect(stateMachine.howManyBottles == 4)
         #expect(stateMachine.interactive == true) // *
         #expect(stateMachine.methodsCalled == ["proceedToNextState()"])
         #expect(subject.state.currentBottle === bottleLayer)
@@ -89,7 +89,7 @@ struct RootProcessorTests {
         #expect(subject.loopingTask != nil)
         let taskResult = await subject.loopingTask!.result
         #expect(try taskResult.get() == ())
-        #expect(stateMachine.bottleNumber == 4)
+        #expect(stateMachine.howManyBottles == 4)
         #expect(stateMachine.interactive == false)
         #expect(stateMachine.methodsCalled == ["proceedToNextState()", "proceedToNextState()", "proceedToNextState()", "proceedToNextState()"])
         #expect(subject.state.currentBottle === bottleLayer)
@@ -105,7 +105,7 @@ struct RootProcessorTests {
     @Test("proposeBottle: stops cycling if WaitingForTap state is encountered")
     func proposeBottleSeriesWaitingForTap() async throws {
         subject.loopingTask = nil
-        let manny = Manny(), moe = WaitingForTap(bottleNumber: 7, interactive: false, verse: []), jack = Jack()
+        let manny = Manny(), moe = WaitingForTap(howManyBottles: 7, interactive: false, verse: []), jack = Jack()
         stateMachine.statesToReturn = [manny, moe, jack, nil]
         let bottleLayer = BottleLayer.init(bottleNumber: 2, scale: 2, screenBounds: .zero)
         await subject.receive(.proposeBottle(bottleLayer, count: 4))
@@ -114,7 +114,7 @@ struct RootProcessorTests {
         #expect(throws: RootProcessor.Exit.exit) {
             try taskResult.get()
         }
-        #expect(stateMachine.bottleNumber == 4)
+        #expect(stateMachine.howManyBottles == 4)
         #expect(stateMachine.interactive == false)
         #expect(stateMachine.methodsCalled == ["proceedToNextState()", "proceedToNextState()"]) // and stops
         #expect(subject.state.currentBottle === bottleLayer)
@@ -151,7 +151,7 @@ struct RootProcessorTests {
     @Test("tapped: with bottle layer but state machine state is not WaitingForTap, still shows action sheet")
     func tappedBottle() async {
         coordinator.actionToReturn = nil
-        stateMachine.currentState = Singer(bottleNumber: 1, interactive: false, verse: [.init(sound: "howdy")])
+        stateMachine.currentState = Singer(howManyBottles: 1, interactive: false, verse: [.init(sound: "howdy")])
         subject.stateMachine = stateMachine
         subject.loopingTask = Task { try await Task.sleep(for: .seconds(1)) }
         subject.stateMachine = stateMachine
@@ -167,7 +167,7 @@ struct RootProcessorTests {
     @Test("tapped: with no bottle layer and state machine state is WaitingForTap, still shows action sheet")
     func tappedWaiting() async {
         coordinator.actionToReturn = nil
-        stateMachine.currentState = WaitingForTap(bottleNumber: 2, interactive: false, verse: [.init(sound: "howdy")])
+        stateMachine.currentState = WaitingForTap(howManyBottles: 2, interactive: false, verse: [.init(sound: "howdy")])
         subject.stateMachine = stateMachine
         subject.loopingTask = Task { try await Task.sleep(for: .seconds(1)) }
         subject.stateMachine = stateMachine
@@ -184,8 +184,8 @@ struct RootProcessorTests {
     func tappedBottleWaiting() async {
         let manny = Manny(), moe = Moe(), jack = Jack()
         stateMachine.statesToReturn = [manny, moe, jack, nil]
-        stateMachine.currentState = WaitingForTap(bottleNumber: 3, interactive: false, verse: [.init(sound: "howdy")])
-        stateMachine.bottleNumber = 4
+        stateMachine.currentState = WaitingForTap(howManyBottles: 3, interactive: false, verse: [.init(sound: "howdy")])
+        stateMachine.howManyBottles = 4
         stateMachine.interactive = false
         subject.state = .init(count: 4, currentBottle: .init(bottleNumber: 3, scale: 2, screenBounds: .zero))
         subject.stateMachine = stateMachine
@@ -196,7 +196,7 @@ struct RootProcessorTests {
         #expect(subject.loopingTask != nil)
         #expect(subject.loopingTask != fakeTask)
         // the real point of the test is to show that the new bottle layer has been substituted
-        #expect(stateMachine.bottleNumber == 4)
+        #expect(stateMachine.howManyBottles == 4)
         #expect(stateMachine.interactive == false)
         #expect(stateMachine.methodsCalled == ["proceedToNextState()", "proceedToNextState()", "proceedToNextState()", "proceedToNextState()"])
         #expect(subject.state.currentBottle === bottleLayer) // *

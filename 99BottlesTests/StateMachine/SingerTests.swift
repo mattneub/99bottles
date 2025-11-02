@@ -12,7 +12,7 @@ struct SingerTests {
 
     @Test("sing: pops first phrase, sets pauseAfterwards, gets url, creates player, tells it to play")
     func sing() async throws {
-        let subject = Singer(bottleNumber: 42, interactive: true, verse: [
+        let subject = Singer(howManyBottles: 42, interactive: true, verse: [
             .init(sound: "howdy", pauseAfterwards: true),
             .init(sound: "there"),
         ])
@@ -32,7 +32,7 @@ struct SingerTests {
 
     @Test("stop: calls player stop")
     func stop() throws {
-        let subject = Singer(bottleNumber: 42, interactive: true, verse: [
+        let subject = Singer(howManyBottles: 42, interactive: true, verse: [
             .init(sound: "howdy", pauseAfterwards: true),
             .init(sound: "there"),
         ])
@@ -44,20 +44,20 @@ struct SingerTests {
 
     @Test("nextState: is another Singer")
     func nextState() throws {
-        let subject = Singer(bottleNumber: 42, interactive: true, verse: [
+        let subject = Singer(howManyBottles: 42, interactive: true, verse: [
             .init(sound: "howdy"),
             .init(sound: "there"),
         ])
         let result = subject.nextState()
         let singer = try #require(result as? Singer)
         #expect(singer.verse == [.init(sound: "howdy"), .init(sound: "there")]) // copies current verse
-        #expect(singer.bottleNumber == 42)
+        #expect(singer.howManyBottles == 42)
         #expect(singer.interactive == true)
     }
 
     @Test("nextState: is WaitingForTap if `pauseAfterwards` is true")
     func nextStatePause() throws {
-        let subject = Singer(bottleNumber: 42, interactive: true, verse: [
+        let subject = Singer(howManyBottles: 42, interactive: true, verse: [
             .init(sound: "howdy"),
             .init(sound: "there"),
         ])
@@ -65,7 +65,7 @@ struct SingerTests {
         let result = subject.nextState()
         let waiting = try #require(result as? WaitingForTap)
         #expect(waiting.verse == [.init(sound: "howdy"), .init(sound: "there")]) // copies current verse
-        #expect(waiting.bottleNumber == 42)
+        #expect(waiting.howManyBottles == 42)
         #expect(waiting.interactive == true)
     }
 }

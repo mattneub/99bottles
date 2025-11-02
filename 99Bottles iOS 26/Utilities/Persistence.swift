@@ -6,7 +6,7 @@ struct Defaults {
     static let interactive = "interactive"
 }
 
-/// Public fact of our Persistence object, so we can mock it for testing.
+/// Public face of our Persistence object, so we can mock it for testing.
 protocol PersistenceType {
     func setLayoutNumber(_: Int)
     func layoutNumber() -> Int

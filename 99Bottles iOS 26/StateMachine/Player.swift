@@ -9,8 +9,10 @@ protocol PlayerType: NSObject, AVAudioPlayerDelegate {
 
 /// Object that plays a sound file in a way that you can wait for with async/await.
 final class Player: NSObject, @MainActor PlayerType {
+    /// Ostensibly, an AVAudioPlayer.
     let audioPlayer: AudioPlayerType
 
+    /// Exposed continuation so that playing is async/await.
     var continuation: CheckedContinuation<Void, Never>?
 
     init(soundFile: URL) throws {
@@ -23,6 +25,7 @@ final class Player: NSObject, @MainActor PlayerType {
         audioPlayer.delegate = self
     }
 
+    /// Play the sound, and return when done.
     func playAsync() async {
         await withCheckedContinuation { continuation in
             self.continuation = continuation
@@ -30,6 +33,7 @@ final class Player: NSObject, @MainActor PlayerType {
         }
     }
 
+    /// Interrupt the sound, if any.
     func stop() {
         audioPlayer.stop()
         continuation?.resume(returning: ())

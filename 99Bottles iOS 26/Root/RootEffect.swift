@@ -7,7 +7,7 @@ enum RootEffect: Equatable {
     /// I need you to pick a bottle and tell me how many bottles there are.
     case proposeBottle
 
-    /// Here's the new layout; remove all existing bottles and make new bottles using this number
+    /// Remove all existing bottles and make new bottles using this number
     /// of rows and columns.
     case startOver(BottleLayout)
 

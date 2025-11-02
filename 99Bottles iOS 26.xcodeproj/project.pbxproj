@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3FF29DEF2EAFB64A00522B23 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 3FF29DEE2EAFB64A00522B23 /* SnapshotTesting */; };
 		3FF29F0D2EAFC5D800522B23 /* WaitWhile in Frameworks */ = {isa = PBXBuildFile; productRef = 3FF29F0C2EAFC5D800522B23 /* WaitWhile */; };
+		3FF6FC612EB78CA700A1D2A6 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 3FF6FC602EB78CA700A1D2A6 /* AppIcon.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +47,7 @@
 		3F44388A2EAEAC1F00B51810 /* 99Bottles iOS 26.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "99Bottles iOS 26.xctestplan"; sourceTree = "<group>"; };
 		3F5457872EAE547E008C7A12 /* 99Bottles iOS 26.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "99Bottles iOS 26.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F5458C32EAE6A40008C7A12 /* 99BottlesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = 99BottlesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3FF6FC602EB78CA700A1D2A6 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -306,6 +308,7 @@
 				3F5457892EAE547E008C7A12 /* 99Bottles iOS 26 */,
 				3F5458C42EAE6A40008C7A12 /* 99BottlesTests */,
 				3F5457882EAE547E008C7A12 /* Products */,
+				3FF6FC602EB78CA700A1D2A6 /* AppIcon.icon */,
 			);
 			sourceTree = "<group>";
 		};
@@ -419,6 +422,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FF6FC612EB78CA700A1D2A6 /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -5,15 +5,15 @@ import Foundation
 struct StateMachineTests {
     @Test("initialize: makes a Preparer as the current state")
     func initialize() throws {
-        let subject = StateMachineFactory().makeStateMachine(bottleNumber: 42, interactive: true)
+        let subject = StateMachineFactory().makeStateMachine(howManyBottles: 42, interactive: true)
         let preparer = try #require(subject.currentState as? Preparer)
         #expect(preparer.interactive == true)
-        #expect(preparer.bottleNumber == 42)
+        #expect(preparer.howManyBottles == 42)
     }
 
     @Test("proceedToNextState: asks current state for next state, makes that next state, returns it")
     func proceed() {
-        let subject = StateMachineFactory().makeStateMachine(bottleNumber: 42, interactive: true)
+        let subject = StateMachineFactory().makeStateMachine(howManyBottles: 42, interactive: true)
         subject.currentState = Manny()
         var previousCurrentState = subject.currentState
         let result1 = subject.proceedToNextState()

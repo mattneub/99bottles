@@ -6,9 +6,9 @@ import CoreGraphics
 struct PreparerTests {
     @Test("nextStage gives Singer with same specifications")
     func nextStage() throws {
-        let subject = Preparer(bottleNumber: 99, interactive: false)
+        let subject = Preparer(howManyBottles: 99, interactive: false)
         let nextState = try #require(subject.nextState() as? Singer)
-        #expect(nextState.bottleNumber == 99)
+        #expect(nextState.howManyBottles == 99)
         #expect(nextState.interactive == false)
         #expect(nextState.verse == subject.verse)
     }
@@ -16,7 +16,7 @@ struct PreparerTests {
     @Test("99 gives correct verse")
     func verse99() {
         let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2, screenBounds: .zero)
-        let subject = Preparer(bottleNumber: 99, interactive: false)
+        let subject = Preparer(howManyBottles: 99, interactive: false)
         let verse = subject.verse
         #expect(verse.count == 10)
         #expect(verse[0].sound == "ninety1")
@@ -58,7 +58,7 @@ struct PreparerTests {
     @Test("99 gives correct verse if interactive")
     func verse99interactive() {
         let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2, screenBounds: .zero)
-        let subject = Preparer(bottleNumber: 99, interactive: true) // *
+        let subject = Preparer(howManyBottles: 99, interactive: true) // *
         let verse = subject.verse
         #expect(verse.count == 10)
         #expect(verse[0].sound == "ninety1")
@@ -100,7 +100,7 @@ struct PreparerTests {
     @Test("2 gives correct verse")
     func verse2() {
         let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2, screenBounds: .zero)
-        let subject = Preparer(bottleNumber: 2, interactive: false)
+        let subject = Preparer(howManyBottles: 2, interactive: false)
         let verse = subject.verse
         #expect(verse.count == 6)
         #expect(verse[0].sound == "two1")
@@ -130,7 +130,7 @@ struct PreparerTests {
     @Test("2 gives correct verse interactive")
     func verse2interactive() {
         let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2, screenBounds: .zero)
-        let subject = Preparer(bottleNumber: 2, interactive: true)
+        let subject = Preparer(howManyBottles: 2, interactive: true)
         let verse = subject.verse
         #expect(verse.count == 6)
         #expect(verse[0].sound == "two1")
@@ -160,7 +160,7 @@ struct PreparerTests {
     @Test("1 gives correct verse")
     func verse1() {
         let bottleLayer = MockBottleLayer(bottleNumber: 5, scale: 2, screenBounds: .zero)
-        let subject = Preparer(bottleNumber: 1, interactive: false)
+        let subject = Preparer(howManyBottles: 1, interactive: false)
         let verse = subject.verse
         #expect(verse.count == 3)
         #expect(verse[0].sound == "onefinal2")
@@ -180,7 +180,7 @@ struct PreparerTests {
 
     @Test("1 gives correct verse interactive")
     func verse1interactive() {
-        let subject = Preparer(bottleNumber: 1, interactive: true)
+        let subject = Preparer(howManyBottles: 1, interactive: true)
         let verse = subject.verse
         #expect(verse.count == 3)
         #expect(verse[0].sound == "onefinal2")

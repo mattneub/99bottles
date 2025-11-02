@@ -34,6 +34,6 @@ final class PreferencesProcessor: Processor {
 
 /// Delegate is told that the view controller was dismissed, and how.
 protocol PreferencesDelegate: AnyObject {
-    func cancel() async
-    func done() async
+    func cancel() async // dismissed, did not save
+    func done() async // dismissed, saved
 }
