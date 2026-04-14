@@ -1,7 +1,6 @@
 @testable import Bottles
 import Testing
 import UIKit
-import WaitWhile
 
 struct RootViewControllerTests {
     let subject = RootViewController()
@@ -55,10 +54,13 @@ struct RootViewControllerTests {
         makeWindow(viewController: subject)
         subject.loadViewIfNeeded()
         subject.view.layoutIfNeeded()
+        print(subject.view.bounds)
+        print(subject.wallView.frame)
         #expect(subject.imageView.superview === subject.view)
         #expect(subject.imageView.frame == subject.view.bounds)
         #expect(subject.wallView.superview === subject.view)
-        #expect(subject.wallView.frame == subject.view.bounds.inset(by: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)))
+        let statusHeight = subject.view.safeAreaInsets.top
+        #expect(subject.wallView.frame == subject.view.bounds.inset(by: UIEdgeInsets(top: statusHeight, left: 0, bottom: 0, right: 0)))
         #expect(subject.numberDisplay.superview === subject.wallView)
         #expect(subject.numberDisplay.center == CGPoint(x: subject.wallView.bounds.midX, y: subject.wallView.bounds.midY))
         let tapper = try #require(subject.view.gestureRecognizers?.first as? MyTapGestureRecognizer)
@@ -67,21 +69,18 @@ struct RootViewControllerTests {
     }
 
     @Test("viewDidLoad: sets up notification observer")
-    func viewDidLoadNotification() async throws {
+    func viewDidLoadNotification() throws {
         subject.loadViewIfNeeded()
         let scene = try #require(UIApplication.shared.connectedScenes.first as? UIWindowScene)
         NotificationCenter.default.post(UIScene.WillDeactivateMessage(scene: scene), subject: scene)
-        await #while(processor.thingsReceived.isEmpty)
         #expect(processor.thingsReceived == [.deactivate])
     }
 
     @Test("viewDidLayoutSubviews: sends initialLayout, first time only")
-    func didLayout() async {
+    func didLayout() {
         subject.viewDidLayoutSubviews()
-        await #while(processor.thingsReceived.isEmpty)
         #expect(processor.thingsReceived == [.initialLayout])
         subject.viewDidLayoutSubviews()
-        try? await Task.sleep(for: .seconds(0.1))
         #expect(processor.thingsReceived == [.initialLayout])
     }
 
@@ -167,10 +166,9 @@ struct RootViewControllerTests {
     }
 
     @Test("tapped: sends tapped")
-    func tapped() async {
+    func tapped() {
         let gestureRecognizer = UITapGestureRecognizer()
         subject.tapped(gestureRecognizer)
-        await #while(processor.thingsReceived.isEmpty)
         #expect(processor.thingsReceived == [.tapped(nil)])
     }
 
@@ -186,7 +184,6 @@ struct RootViewControllerTests {
         processor.thingsReceived = []
         // that was prep, here comes the test
         subject.tapped(MyGestureRecognizer()) // taps in middle of screen, where our one big bottle is
-        await #while(processor.thingsReceived.isEmpty)
         #expect(processor.thingsReceived == [.tapped(bottle)])
     }
 }

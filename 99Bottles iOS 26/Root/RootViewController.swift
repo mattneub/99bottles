@@ -11,7 +11,7 @@ final class RootViewController: UIViewController, ReceiverPresenter {
     lazy var observer = NotificationCenter.default.addObserver(
         for: UIScene.WillDeactivateMessage.self
     ) { [weak self] _ in
-        Task {
+        Task.immediate {
             await self?.processor?.receive(.deactivate)
         }
     }
@@ -78,7 +78,7 @@ final class RootViewController: UIViewController, ReceiverPresenter {
     override func viewDidLayoutSubviews() {
         if !self.didInitialSetup {
             self.didInitialSetup = true
-            Task {
+            Task.immediate {
                 await processor?.receive(.initialLayout)
             }
         }
@@ -181,7 +181,7 @@ final class RootViewController: UIViewController, ReceiverPresenter {
         // about this. So just in case, report the bottle and let the processor decide.
         let location = gestureRecognizer.location(in: view) // wallView's superview -> superLayer
         let bottleLayer = wallView.layer.hitTest(location) as? BottleLayer
-        Task {
+        Task.immediate {
             await processor?.receive(.tapped(bottleLayer))
         }
     }

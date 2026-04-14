@@ -27,15 +27,26 @@ final class RootProcessor: Processor {
         case .deactivate:
             await stopEverything()
         case .initialLayout:
+            // clear out our properties, to signal that we are effectively launching
+            loopingTask?.cancel()
+            loopingTask = nil
+            stateMachine = nil
+            state.currentBottle = nil
             let layoutIndex = services.persistence.layoutNumber()
             let layout = BottleLayout.layouts[layoutIndex]
             await presenter?.receive(.startOver(layout))
+            try? await unlessTesting {
+                try? await Task.sleep(for: .seconds(0.1)) // pause before starting to sing
+            }
             await presenter?.receive(.proposeBottle)
         case .proposeBottle(let bottle, let count):
             state.currentBottle = bottle
             state.count = count
             await startSinging()
         case .tapped(let bottle):
+            guard stateMachine != nil, loopingTask != nil else {
+                return // we haven't finished launching yet, can't interrupt
+            }
             await tapped(bottle)
         }
     }

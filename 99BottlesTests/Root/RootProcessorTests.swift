@@ -34,10 +34,16 @@ struct RootProcessorTests {
         #expect(presenter.thingsReceived == [.cancelAnimations])
     }
 
-    @Test("initialLayout: get layout number from persistence, sends startOver and proposeBottle")
+    @Test("initialLayout: clears properties, get layout number from persistence, sends startOver and proposeBottle")
     func initialLayout() async {
+        let task = Task { try await Task.sleep(for: .seconds(1)) }
+        subject.loopingTask = task
+        subject.stateMachine = stateMachine
         persistence.layoutToReturn = 4
         await subject.receive(.initialLayout)
+        #expect(task.isCancelled == true)
+        #expect(subject.loopingTask == nil)
+        #expect(subject.stateMachine == nil)
         #expect(persistence.methodsCalled == ["layoutNumber()"])
         #expect(presenter.thingsReceived == [.startOver(BottleLayout.layouts[4]), .proposeBottle])
     }
@@ -209,26 +215,40 @@ struct RootProcessorTests {
         #expect(presenter.thingsReceived == [.updateLabel, .proposeBottle])
     }
 
+    @Test("tapped: if properties are nil, does nothing")
+    func tappedNil() async {
+        await subject.receive(.tapped(nil))
+        #expect(coordinator.methodsCalled.isEmpty)
+    }
+
     @Test("tapped: if result is .resume, send .updateLabel and .proposeBottle")
     func tappedResume() async {
+        subject.loopingTask = Task {}
+        subject.stateMachine = stateMachine
         coordinator.actionToReturn = MyAlertAction().applying {
             $0.userInfo = ["result": RootProcessor.TapAction.resume]
         }
         await subject.receive(.tapped(nil))
+        #expect(coordinator.methodsCalled == ["showActionSheet(title:titles:userInfos:)"])
         #expect(presenter.thingsReceived == [.cancelAnimations, .updateLabel, .proposeBottle])
     }
 
     @Test("tapped: if result is start over, sends trampoline startOver")
     func tappedStartOver() async {
+        subject.loopingTask = Task {}
+        subject.stateMachine = stateMachine
         coordinator.actionToReturn = MyAlertAction().applying {
             $0.userInfo = ["result": RootProcessor.TapAction.startOver]
         }
         await subject.receive(.tapped(nil))
+        #expect(coordinator.methodsCalled == ["showActionSheet(title:titles:userInfos:)"])
         #expect(trampoline.methodsCalled == ["startOver()"])
     }
 
     @Test("tapped: if result is .preferences, call coordinator showPreferences")
     func tappedPreferences() async {
+        subject.loopingTask = Task {}
+        subject.stateMachine = stateMachine
         coordinator.actionToReturn = MyAlertAction().applying {
             $0.userInfo = ["result": RootProcessor.TapAction.preferences]
         }

@@ -1,7 +1,6 @@
 @testable import Bottles
 import Testing
 import UIKit
-import WaitWhile
 
 struct PreferencesViewControllerTests {
     let subject = PreferencesViewController(nibName: "Preferences", bundle: nil)
@@ -12,7 +11,7 @@ struct PreferencesViewControllerTests {
     }
 
     @Test("viewDidLoad: configures navigation item, sends initialData")
-    func viewDidLoad() async throws {
+    func viewDidLoad() throws {
         subject.loadViewIfNeeded()
         #expect(subject.navigationItem.title == "Preferences")
         let done = try #require(subject.navigationItem.rightBarButtonItem)
@@ -21,7 +20,6 @@ struct PreferencesViewControllerTests {
         let cancel = try #require(subject.navigationItem.leftBarButtonItem)
         #expect(cancel.target === subject)
         #expect(cancel.action == #selector(subject.cancel))
-        await #while(processor.thingsReceived.isEmpty)
         #expect(processor.thingsReceived == [.initialData])
     }
 
@@ -37,19 +35,17 @@ struct PreferencesViewControllerTests {
     }
 
     @Test("done: sends done, reporting state of interface")
-    func done() async throws {
+    func done() {
         subject.loadViewIfNeeded()
         subject.pickerView.selectRow(10, inComponent: 0, animated: false)
         subject.autoplaySwitch.isOn = false
         subject.done()
-        await #while(processor.thingsReceived.count < 2)
         #expect(processor.thingsReceived.last == .done(10, false))
     }
 
     @Test("cancel: sends cancel")
-    func cancel() async throws {
+    func cancel() {
         subject.cancel()
-        await #while(processor.thingsReceived.isEmpty)
         #expect(processor.thingsReceived == [.cancel])
     }
 
@@ -82,11 +78,10 @@ struct PreferencesViewControllerTests {
     }
 
     @Test("didDismiss: sends cancel")
-    func didDismiss() async {
+    func didDismiss() {
         subject.presentationControllerDidDismiss(
             UIPresentationController(presentedViewController: UIViewController(), presenting: nil)
         )
-        await #while(processor.thingsReceived.isEmpty)
         #expect(processor.thingsReceived == [.cancel])
     }
 }

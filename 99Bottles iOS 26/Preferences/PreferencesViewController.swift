@@ -15,7 +15,7 @@ final class PreferencesViewController: UIViewController, ReceiverPresenter {
         navigationItem.rightBarButtonItem = done
         let cancel = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
         navigationItem.leftBarButtonItem = cancel
-        Task {
+        Task.immediate {
             await processor?.receive(.initialData)
         }
     }
@@ -29,14 +29,14 @@ final class PreferencesViewController: UIViewController, ReceiverPresenter {
     @objc func done() {
         let layout = pickerView.selectedRow(inComponent: 0)
         let autoplay = autoplaySwitch.isOn
-        Task {
+        Task.immediate {
             await processor?.receive(.done(layout, autoplay))
         }
     }
 
     /// Cancel button in nav bar.
     @objc func cancel() {
-        Task {
+        Task.immediate {
             await processor?.receive(.cancel)
         }
     }
@@ -60,7 +60,7 @@ extension PreferencesViewController: UIPickerViewDataSource, UIPickerViewDelegat
 /// User might dismiss by dragging. This is equivalent to cancellation. Delegation set by coordinator.
 extension PreferencesViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        Task {
+        Task.immediate {
             await processor?.receive(.cancel)
         }
     }
